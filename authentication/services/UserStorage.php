@@ -6,7 +6,7 @@
         const EMAIL_REGEX = '/^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/';     
         const MAX_USERS = 1000;
         const PASSWORD_REGEX ='/^(?=.*[A-Za-z])(?=.*\d)[A-Za-z\d]{8,}$/';  //sample regexes, might change later
-        const USERNAME_REGEX = '/^[a-zA-Z0-9_]{3,20}$/';       
+        const USERNAME_REGEX = '/^[a-zA-Z0-9]{3,20}$/';       
         const NAME_REGEX = '/^[A-Za-z]{2,}$/';   
        
         const FN_REGEX = '(/^[0-9]{1}MI[0-9]{7}$/)|(/^[0-9]{7})';  
@@ -20,9 +20,9 @@
         private $db;
 
 
-        function __construct() {
-           $this->db = new DB();
-        }
+       function __construct() {
+            $this->db = new DB();
+       }
 
         
        function validateUserData($userData) {
@@ -82,8 +82,7 @@
 
          if ($valid["isValid"] && $validRole["isValid"]) {
 
-           //$userData["password"] = password_hash(
-               //$userData["password"], PASSWORD_DEFAULT);
+           $userData["password"] = password_hash($userData["password"], PASSWORD_DEFAULT);
 
         try {
                 $conn = $this->db->getConnection();
@@ -127,20 +126,16 @@
             $stmt = $connection->prepare($sql);
             $stmt->execute([$userData["email"]]);
 
-            if ($stmt->rowCount() === 1) {
-                $user = $stmt->fetchAll(PDO::FETCH_ASSOC)[0];
+                $user = $stmt->fetch(PDO::FETCH_ASSOC);
                 
-              password_verify($userData["password"], $user["password"]);
+               $isPasswordValid = password_verify($userData["password"], $user["password"]);
                               
-                if ($userData["password"]===$user["password"]) { //for testing purposes, change to password_verify later
-                    unset($user["password"]);
+                if (!$isPasswordValid) { //for testing purposes, change to password_verify later                    
                     return $user;
                 } else {
                     return null;
                 }
-            } else {
-                return null;  
-            }
+           
         } catch (PDOException $exc) {
             throw new Error($exc->getMessage());
         }
