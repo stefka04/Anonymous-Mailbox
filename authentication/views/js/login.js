@@ -117,7 +117,7 @@ form.addEventListener('submit', (event) => {
         password: password
     };
 
-    fetch('../services/login.php', {
+    fetch('../services/new-login.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
