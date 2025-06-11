@@ -1,7 +1,7 @@
 <?php
 require_once __DIR__ . '/../models/message.php';
 require_once __DIR__ . '/messageRepositoryAPI.php';
-require_once __DIR__ . '/../../storage/db.php';
+require_once __DIR__ . '/../../db/db.php';
 
 define("INBOX_FOLDER_ID", 1);
 define("SENT_FOLDER_ID", 2);
@@ -33,7 +33,7 @@ class MessageRepository implements MessageRepositoryAPI {
             $insertStatement = $connection->prepare($sql);
 
             foreach ($recipientsIds as $recipientId) {
-                //if Group::isValidGroupId($recipientId) {
+                //if Group::isValidGroupId($recipientId) {     //TO-DO remove group logic
                 if ($this->isValidGroupId($recipientId)) {
                 //$members = Group::getMembersIdsOfGroup($recipientId)
                 $members = $this->getMembersIdsOfGroup($recipientId);

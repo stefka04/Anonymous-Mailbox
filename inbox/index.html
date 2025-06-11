@@ -7,6 +7,7 @@
     <link href="./css/style.css" rel="stylesheet" />
     <script src="./javascript/new-message.js" defer></script>
     <script src="./javascript/open-message.js" defer></script>
+    <script src="./javascript/send-message.js" defer></script>
 </head>
 
 <body id="page-body">
@@ -70,7 +71,7 @@
 
         <section>
             <div id="new-message" style="display: none;">
-                <form id="new-message-form">
+                <form name="new-message-form" id="new-message-form">
                     <div>
                         <table>
                             <tbody>
@@ -100,7 +101,7 @@
                                 <tr>
                                     <td><input type="submit" id="send-message-button" value="Изпращане" /></td>
                                     <td>
-                                        <input type="checkbox" id="check-anonymity" name ="check-anonymity" value="Anonymity" />
+                                        <input type="checkbox" id="check-anonymity" name ="check_anonymity" value="Anonymity" />
                                         <label for="check-anonymity">Анонимно</label>
                                     </td>
                                 </tr>

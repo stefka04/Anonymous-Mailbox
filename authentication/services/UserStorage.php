@@ -168,7 +168,27 @@
         echo json_encode(["message" => "Невалидни данни"]);
     }            
 }
+//NEW - for addMessage
+    function getIdOfUserByUsername($username) {
+         try {
+            $connection = $this->db->getConnection();
+            $sql = "SELECT id from users where username = ?";
+            $stmt = $connection->prepare($sql);
+            $stmt->execute([$username]);
+            
+            $userId = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $userId['id'];
+        } catch (PDOException $exc) {
+            error_log(date("Y-m-d H:i:s") . " - Error occurred while adding message: "
+             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
+            http_response_code(500);
+            exit();
+        }
+    }
+//END NEW 
 
+
+    //TO REMOVE!!
     function resetPassword() {
         $userData = json_decode(file_get_contents("php://input"), true);
         if (!$userData || !isset($userData["username"]) || !isset($userData["password"])) {
