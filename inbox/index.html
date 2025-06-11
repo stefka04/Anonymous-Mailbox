@@ -17,55 +17,56 @@
         </div>
     </header>
 
-    <main id = "main-page">
-        <section id = "menu-section">
+    <main id="main-page">
+        <section id="menu-section">
             <div id="menu-div">
-                <h2 id = "create-message" class="menu-option">
+                <h2 id="create-message" class="menu-option">
                     <img id="pencil-icon" class="icons" src="../img/pencil.png" alt="Pencil icon" />
                     Ново съобщение
-                </h2>            
-                <h2 id = "inbox" class="menu-option">
+                </h2>
+                <h2 id="inbox" class="menu-option">
                     <img id="inbox-icon" class="icons" src="../img/inbox.png" alt="Inbox icon" />
                     Входяща поща
                 </h2>
-                <h2 id = "inbox" class="menu-option">
+                <h2 id="inbox" class="menu-option">
                     <img id="sent-icon" class="icons" src="../img/sent.png" alt="Sent icon" />
                     Изпратени
                 </h2>
-                <h2 id = "inbox" class="menu-option">
+                <h2 id="inbox" class="menu-option">
                     <img id="star-icon" class="icons" src="../img/star.png" alt="Star icon" />
                     Със звезда
                 </h2>
-                <h2 id = "inbox" class="menu-option">
+                <h2 id="inbox" class="menu-option">
                     <img id="bin-icon" class="icons" src="../img/bin.png" alt="Bin icon" />
                     Изтрити
                 </h2>
-                <!--Drafts??-->
             </div>
         </section>
-              
-    <section id="messages-table-section"> 
-             <table id="message-table">
-                <tbody>
-                    <tr class="message-row">                       
-                        <td class="message-cell">
-                        <h4>
-                            <img id="star-icon" class="icons" src="../img/star.png" alt="Star icon" />                                                
-                            Примерно съобщение
-                            
-                        </h4>   <!--when clicking on, a sample message page opens-->
-                        </td>   
-                        
-                        <td class="bin-cell"> 
-                            <img id="bin-icon" class="icons" src="../img/bin.png" alt="Bin icon" />   
+        <!--before was main-->
+        <section class="main-content" id="main-content-section">
+            <h1 id="main-view-title"></h1>
+            <div class="main-view-content">
+                <table id="messages-table">
+                    <thead id="inbox-table-head" style="display:none">
+                        <td>
+                            <select name="sort-options" id="sort-options">
+                                <option value="" disabled selected hidden>Сортирай по:</option>
+                                <option value="date-ASC">Дата - възходящо</option>
+                                <option value="date-DESC">Дата - низходящо</option>
+                            </select>
+                            <select name="filter-options" id="filter-options">
+                                <option value="" disabled selected hidden>Филтрирай по:</option>
+                                <option value="anonymous">Анонимни</option>
+                                <option value="non-anonymous">Неанонимни</option>
+                                <option value="read">Прочетени</option>
+                                <option value="unread">Непрочетени</option>
+                            </select>
                         </td>
-                    </tr> 
-                    
-                    <!--page for adding new roles corresponding to messages-->
-                </tbody>
-             </table>
-        
-
+                    </thead>
+                    <tbody id="inbox-table-body"></tbody>
+                </table>
+            </div>
+        </section>
 
         <section>
             <div id="new-message" style="display: none;">
@@ -77,8 +78,6 @@
                                     <td id="new-message-title">
                                         <h2>Ново съобщение</h2>
                                     </td>
-                                    <td><img id="minimize-icon" class="new-message-nav-icons" src="../img/minimize.png"
-                                            alt="Minimize icon" title="Намаляване" /></td>
                                     <td><img id="cancel-icon" class="new-message-nav-icons" src="../img/cancel.png"
                                             alt="Cancel icon" title="Затваряне БЕЗ запазване" /></td>
                                 </tr>
@@ -100,8 +99,10 @@
                             <tbody>
                                 <tr>
                                     <td><input type="submit" id="send-message-button" value="Изпращане" /></td>
-                                    <td><img id="attach-files-icon" class="icons" src="../img/attach-files.png"
-                                            alt="attach-files icon" /></td>
+                                    <td>
+                                        <input type="checkbox" id="check-anonymity" name ="check-anonymity" value="Anonymity" />
+                                        <label for="check-anonymity">Анонимно</label>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
@@ -109,8 +110,6 @@
                 </form>
             </div>
         </section>
-
-      </section>
     </main>
 </body>
 
