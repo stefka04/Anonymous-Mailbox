@@ -36,7 +36,7 @@
         }
 
         if (!preg_match(PASSWORD_REGEX , $userData["password"])) {
-            return ["isValid" => false, "message" => "Невалидна парола!". $userData["password"]];
+            return ["isValid" => false, "message" => "Невалидна парола!"];
         }
         
         if (!preg_match(USERNAME_REGEX , $userData["username"])) {
@@ -56,7 +56,7 @@
 
     function handleRoles($userData) {
         if ($userData["role"] === STUDENT_ROLE) {            
-            if (!preg_match(FN_REGEX, $userData["fn"])) {  //TO DO: validate fn- regex and existence in the csv file
+            if (!preg_match(FN_REGEX, $userData["fn"])) {  
                 return ["isValid" => false, "message" => "Студент с такъв ФН не съществува!"];
             }
         } elseif ($userData["role"] === TEACHER_ROLE) {          
@@ -85,12 +85,13 @@
            $userData["password"] = password_hash($userData["password"], PASSWORD_DEFAULT);
 
         try {
-                $conn = $this->db->getConnection();
-                $userCount = $this->getUserCount($conn);
+                $conn = $this->db->getConnection();                
+
+                $userId = $conn->lastInsertId(); 
                 $sql = "INSERT INTO users (id, fn, email, password, username, name, surname, role) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
                 $stmt = $conn->prepare($sql);
-                $stmt->execute([$userCount + 1, $userData["fn"], $userData["email"], 
+                $stmt->execute([$userId, $userData["fn"], $userData["email"], 
                             $userData["password"], $userData["username"],
                             $userData["name"], $userData["surname"],
                             $userData["role"]]);
@@ -179,7 +180,7 @@
             return $userId['id'];
         } catch (PDOException $exc) {
             error_log(date("Y-m-d H:i:s") . " - Error occurred while adding message: "
-             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
+             . $exc->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
             http_response_code(500);
             exit();
         }

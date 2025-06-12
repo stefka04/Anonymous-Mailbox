@@ -7,6 +7,7 @@
     $message = $_SESSION['message'] ? $_SESSION['message']  : null;
     if ($message) {
        
+      $_SESSION['message']['id'] = $message['id'];
       $_SESSION['message']['senderUsername'] = htmlspecialchars($message['isAnonymous'] ? 'Анонимен' : $message['senderUsername']);
       $_SESSION['message']['topic'] = htmlspecialchars($message['topic']);
       $_SESSION['message']['content'] = htmlspecialchars($message['content']);
@@ -57,6 +58,7 @@
                     <img id="bin-icon" class="icons" src="../../img/bin.png" alt="Bin icon" />
                     Изтрити
                 </h2>
+                <!--Drafts??-->
             </div>
         </section>
               
@@ -91,6 +93,8 @@
                                     <td id="new-message-title">
                                         <h2>Ново съобщение</h2>
                                     </td>
+                                    <td><img id="minimize-icon" class="new-message-nav-icons" src="../../img/minimize.png"
+                                            alt="Minimize icon" title="Намаляване" /></td>
                                     <td><img id="cancel-icon" class="new-message-nav-icons" src="../../img/cancel.png"
                                             alt="Cancel icon" title="Затваряне БЕЗ запазване" /></td>
                                 </tr>
@@ -112,6 +116,8 @@
                             <tbody>
                                 <tr>
                                     <td><input type="submit" id="send-message-button" value="Изпращане" /></td>
+                                    <td><img id="attach-files-icon" class="icons" src="../../img/attach-files.png"
+                                            alt="attach-files icon" /></td>
                                 </tr>
                             </tbody>
                         </table>
