@@ -29,15 +29,15 @@
                     <img id="inbox-icon" class="icons" src="../img/inbox.png" alt="Inbox icon" />
                     Входяща поща
                 </h2>
-                <h2 id="inbox" class="menu-option">
+                <h2 id="sent" class="menu-option">
                     <img id="sent-icon" class="icons" src="../img/sent.png" alt="Sent icon" />
                     Изпратени
                 </h2>
-                <h2 id="inbox" class="menu-option">
+                <h2 id="starred" class="menu-option">
                     <img id="star-icon" class="icons" src="../img/star.png" alt="Star icon" />
                     Със звезда
                 </h2>
-                <h2 id="inbox" class="menu-option">
+                <h2 id="deleted" class="menu-option">
                     <img id="bin-icon" class="icons" src="../img/bin.png" alt="Bin icon" />
                     Изтрити
                 </h2>
@@ -49,12 +49,14 @@
             <div class="main-view-content">
                 <table id="messages-table">
                     <thead id="inbox-table-head" style="display:none">
-                        <td>
+                        <td class="select-options">
                             <select name="sort-options" id="sort-options">
                                 <option value="" disabled selected hidden>Сортирай по:</option>
                                 <option value="date-ASC">Дата - възходящо</option>
                                 <option value="date-DESC">Дата - низходящо</option>
                             </select>
+                        </td>
+                        <td class="select-options">
                             <select name="filter-options" id="filter-options">
                                 <option value="" disabled selected hidden>Филтрирай по:</option>
                                 <option value="anonymous">Анонимни</option>
@@ -99,9 +101,11 @@
                         <table>
                             <tbody>
                                 <tr>
-                                    <td><input type="submit" id="send-message-button" class="new-message-buttons" value="Изпращане" /></td>
+                                    <td><input type="submit" id="send-message-button" class="new-message-buttons"
+                                            value="Изпращане" /></td>
                                     <td>
-                                        <input type="checkbox" id="check-anonymity" name ="check_anonymity" value="Anonymity" />
+                                        <input type="checkbox" id="check-anonymity" name="check_anonymity"
+                                            value="Anonymity" />
                                         <label for="check-anonymity">Анонимно</label>
                                     </td>
                                 </tr>
@@ -111,7 +115,7 @@
 
                     <div id="error-no-recipients" class="errors">
                         <span id="error-message">Грешка!</span>
-                        <input type="button" id="close-error-btn" class="new-message-buttons" value="ОК"/>
+                        <input type="button" id="close-error-btn" class="new-message-buttons" value="ОК" />
                     </div>
                 </form>
             </div>

@@ -65,6 +65,7 @@ body {
 
 #main-content-section {
     width: 80%;
+    padding: 12px;
 }
 
 .menu-option:hover {
@@ -124,4 +125,45 @@ body {
     margin-top: 10px;
     padding: 8px 16px;
     cursor: pointer;
+}
+
+/*From old project*/
+.icons{
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+}
+
+.icons:hover {
+    background-color: rgba(255, 249, 249, 0.523);
+}
+
+.table-messages-rows {
+    cursor: pointer;
+}
+
+.table-messages-rows:hover {
+    background-color: rgb(219, 219, 219);
+}
+
+.main-view-content {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: auto;
+    display: block;
+}
+
+#messages-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#inbox-table-head {
+    height: 64px;
+}
+
+.select-options {
+    background-color: rgb(219, 219, 219);
 }
