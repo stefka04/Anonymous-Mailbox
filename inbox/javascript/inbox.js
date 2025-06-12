@@ -1,14 +1,10 @@
 
 
-//import { initializeGroups } from './groups.js';
-
 document.addEventListener('DOMContentLoaded', () => {
 
    
 
-    // initializeGroups();
-
-    const sidebarNav = document.querySelector('.sidebar-nav ul');
+    //const sidebarNav = document.querySelector('.sidebar-nav ul');
     const mainViewTitle = document.getElementById('main-view-title');
 
 
@@ -21,6 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
             if (event.target.id.startsWith('star-')) {
                 const starId = event.target.id;
                 const starIcon = document.getElementById(starId);
+                
+
                 const numIdStart = 5;
                 const messageId = starId.substring(numIdStart);
                 var starred = true;
@@ -115,7 +113,14 @@ document.addEventListener('DOMContentLoaded', () => {
                     const star = document.createTextNode("star");
                     starIcon.appendChild(star);
                     starIcon.style.backgroundColor = message['isStarred'] ? "yellow" : '';
+                     //new
+                    const starImage = document.createElement('img');
+                    //starImage.setAttribute("src", "../img/star.png");
+                    starIcon.appendChild(starImage);
+                    //end
                     messageSender.appendChild(starIcon);
+
+                   
 
                     var sender;
                     if (message['isAnonymous']) {
@@ -151,11 +156,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     tableBody.appendChild(messageRow);
 
+                    const idToSent = message['id'];
                     messageRow.addEventListener("click", (e) => {
                         fetch('./services/set-message-in-session.php', {
                          method: "POST",
                          body: JSON.stringify(message),
-                    }).then(window.location.href = ' ../messages/views/open-message.php')
+                    }).then(() => {
+                        window.location.href = `../messages/views/open-message.php?messageId=${idToSent}`;
+                    })
             });
                 });
             })
