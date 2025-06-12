@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', () => {
                          method: "POST",
                          body: JSON.stringify(message),
                     }).then(() => {
-                        window.location.href = `../messages/views/open-message.php?messageId=${idToSent}`;
+                        window.location.href = '../messages/views/open-message.php';
                     })
             });
                 });

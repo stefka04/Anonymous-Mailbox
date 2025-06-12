@@ -1,9 +1,56 @@
+//reading notes from DB
 //Extracting the existing notes from the query parameter
-document.addEventListener('DOMContentLoaded', () => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const messageId = urlParams.get('messageId');
-    console.log(`Loaded messageId: ${messageId}`);
-});
+
+loadNotesForMessage();
+    
+
+
+
+
+
+
+function loadNotesForMessage() {
+    try {
+        fetch('../services/get-notes.php')
+        .then(response => response.json())
+        .then(result => {
+            if (result.status !== 'success') {
+            console.error('Няма достъп до бележките:', result.message);
+            return;
+        }
+           result.data.forEach(noteData => {
+            const note = document.createElement('section');
+            note.classList.add("sticky-note");
+            note.style.position = "absolute";
+            note.style.width = "120px";
+            note.style.height = "100px";
+            note.style.backgroundColor = "#FFFAA0";
+            note.style.border = "1px solid white";
+            note.style.top = `${noteData.posY}px`;
+            note.style.left = `${noteData.posX}px`;
+
+            const input = document.createElement('input');
+            input.value = noteData.content;
+            input.style.boxSizing = "border-box";
+            input.style.height = "100%";
+            input.style.width = "100%";
+            input.style.backgroundColor = "#FFFAA0";
+
+            note.appendChild(input);
+            handleCancelImage(note);
+            handleSaveImage(note);
+            makeDraggable(note);
+
+            document.getElementById('message-text')?.appendChild(note); 
+        });
+      })
+    } catch (error) {
+        console.error('Error fetching notes:', error);
+    }
+}
+
+
+
 
 //some notes-dragging functions:
 function makeDraggable(element) {
@@ -71,16 +118,13 @@ function handleSaveImage(noteElement) {
         const content = input.value || "";
         const posX = parseInt(noteElement.style.left);
         const posY = parseInt(noteElement.style.top);
-        const targetMessageId = messageId;
-
-        
-        console.log("Saving note for messageId:", targetMessageId);
+        //const targetMessageId = messageId;        
+       
     //new
          const response =  fetch('../services/save-note.php', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-                messageId: messageId,
                 content,
                 posX,
                 posY
@@ -129,7 +173,7 @@ document.querySelectorAll('.annotatable').forEach(element => {
     //mapping the nwely created note to its element
     note.dataset.target = element.getAttribute('id');   //redundant?
 
-    note.dataset.messageId = messageId;  //Important!!!
+    //note.dataset.messageId = messageId;  //Important!!!
 
     element.appendChild(note);
     note.focus();
