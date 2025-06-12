@@ -11,50 +11,6 @@ forgottenPasswdLabel.addEventListener('click', () => {
 });
 
 
-/*function sendVerificationCode() {
-      const verificationCode = Math.floor(100000 + Math.random() * 900000);
-      const emailField = document.getElementById("hidden-email");
-      const email = emailField.value.trim();
-      const codeData = {
-          email: email,
-          code: verificationCode
-      };
-
-      fetch('./sendEmail.php', {
-        method: 'POST',   
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(codeData),
-    })
-    .then(response => response.json().then(data => {
-    data.status = response.status; 
-    analyzeResponse(data);
-}));
-}*/
-
-const sendCodeButton = document.getElementById("send-code-btn");
-sendCodeButton.addEventListener('click', () => {
-    const codeLabel = document.getElementById("code-label");
-    codeLabel.style.display = "block";
-    const codeInput = document.getElementById("code");
-    codeInput.style.display = "block";
-
-    const usernameLabel = document.getElementById("username-label");
-    usernameLabel.style.display = "block";
-    const usernameField = document.getElementById("username-field");
-    usernameField.style.display = "block";
-    const newPasswdInput = document.getElementById("new-password");
-    newPasswdInput.style.display = "block";
-    const forgottenPasswdButton = document.getElementById("forgotten-password-btn");
-    forgottenPasswdButton.style.display = "block";
-
-    //send code to email
-    sendVerificationCode();
-});
-
-
-
 function createLabel(message, messageColor) {
      const responseLabel = document.getElementById("response-label");
      responseLabel.style.display = "block";
@@ -70,39 +26,6 @@ function analyzeResponse(response, message) {
 }
 }
 
-const forgottenPasswdButton = document.getElementById("forgotten-password-btn");
-/*forgottenPasswdButton.addEventListener('click', () => {    
-    const codeInput = document.getElementById("code");
-    //code check
-    const code = codeInput.value.trim();
-    if (code !== verificationCode.toString()) {
-        createLabel("Грешен код! Моля, опитайте отново.", "red");
-        return;
-    }
-
-    const usernameField = document.getElementById("username-field");
-    const newPasswdInput = document.getElementById("new-password");
-    const username = usernameField.value.trim();
-    const newPassword = newPasswdInput.value.trim();
-
-    const userData = {
-        username: username,
-        password: newPassword 
-    };
-
-     fetch('./resetPassword.php', {
-        method: 'POST',   
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(userData),
-    })
-    .then(response => response.json().then(data => {
-    data.status = response.status; 
-    analyzeResponse(data, "Успешна промяна на паролата! Влезте с новите си данни.");
-}))
-});
-*/
 
 const form = document.getElementById('login-form');
 form.addEventListener('submit', (event) => {
