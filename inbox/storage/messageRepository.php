@@ -24,7 +24,7 @@ class MessageRepository implements MessageRepositoryAPI {
             $insertStatement->execute([$senderId, $sentAt, $topic, $content, $chainNumber, $isAnonymous]);  
 
             $messageId = $connection->lastInsertId();
-            //add to message_status_table AS SENT --new private method
+            //add to message_status_table AS SENT
             $sql = "INSERT INTO user_messages_status (messageId, userId, messageFolderId) VALUES (?, ?, ?)";
             $insertStatement = $connection->prepare($sql);
             $insertStatement->execute([$messageId, $senderId, SENT_FOLDER_ID]); 
@@ -48,7 +48,7 @@ class MessageRepository implements MessageRepositoryAPI {
                 } else {
                     $insertStatement->execute([$messageId, $recipientId, null]);
 
-                    //add to message_status_table AS received  -->new method !!!!
+                    //add to message_status_table AS received
                     $sqlInsertInFolder = "INSERT INTO user_messages_status (messageId, userId, messageFolderId) VALUES (?, ?, ?)";
                     $insertStatementMessageStatus = $connection->prepare($sqlInsertInFolder);
                     $insertStatementMessageStatus->execute([$messageId, $recipientId, INBOX_FOLDER_ID]);  

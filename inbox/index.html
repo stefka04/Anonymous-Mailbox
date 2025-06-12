@@ -99,7 +99,7 @@
                         <table>
                             <tbody>
                                 <tr>
-                                    <td><input type="submit" id="send-message-button" value="Изпращане" /></td>
+                                    <td><input type="submit" id="send-message-button" class="new-message-buttons" value="Изпращане" /></td>
                                     <td>
                                         <input type="checkbox" id="check-anonymity" name ="check_anonymity" value="Anonymity" />
                                         <label for="check-anonymity">Анонимно</label>
@@ -107,6 +107,11 @@
                                 </tr>
                             </tbody>
                         </table>
+                    </div>
+
+                    <div id="error-no-recipients" class="errors">
+                        <span id="error-message">Грешка!</span>
+                        <input type="button" id="close-error-btn" class="new-message-buttons" value="ОК"/>
                     </div>
                 </form>
             </div>
