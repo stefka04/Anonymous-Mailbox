@@ -151,12 +151,22 @@ document.addEventListener('DOMContentLoaded', () => {
                     tableBody.appendChild(messageRow);
 
                    // messageRow.addEventListener("click", (e) => {
-                    messageSender.addEventListener("click", (e) => {
+                   /* messageSender.addEventListener("click", (e) => {
                         fetch('./services/set-message-in-session.php', {
                             method: "POST",
                             body: JSON.stringify(message),
                         }).then(window.location.href = ' ../messages/views/open-message.php')
-                    });
+                    });*/
+
+                     const idToSent = message['id'];                //NEW!!!!! CHECK!!!!
+                     messageSender.addEventListener("click", (e) => {
+                        fetch('./services/set-message-in-session.php', {
+                         method: "POST",
+                         body: JSON.stringify(message),
+                    }).then(() => {
+                        window.location.href = `../messages/views/open-message.php?messageId=${idToSent}`;
+                    })
+            });
                 });
             })
     }
