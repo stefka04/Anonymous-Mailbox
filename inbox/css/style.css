@@ -63,7 +63,7 @@ body {
     border-radius: 10px;
 }
 
-#messages-table-section {
+#main-content-section {
     width: 80%;
 }
 
@@ -77,12 +77,14 @@ body {
 }
 
 
-#message-table {
+#messages-table{
     padding-left: 5%;
     width: 80%;    
 }
 
-.message-cell{   
+
+/*styling for inbox-table-head needed*/
+.table-messages-rows{   
     width: 100%; 
     border-top: 1px solid black;
     border-bottom: 1px solid black;

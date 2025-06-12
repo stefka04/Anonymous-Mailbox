@@ -1,10 +1,10 @@
-import { initializeCompose } from './compose.js';
+
 
 //import { initializeGroups } from './groups.js';
 
 document.addEventListener('DOMContentLoaded', () => {
 
-    initializeCompose();
+   
 
     // initializeGroups();
 
@@ -152,17 +152,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     tableBody.appendChild(messageRow);
 
                     messageRow.addEventListener("click", (e) => {
-                        fetch('services/set-message-in-session.php', {
+                        fetch('./services/set-message-in-session.php', {
                          method: "POST",
                          body: JSON.stringify(message),
-                    }).then(window.location.href = ' views/open-message.php')
+                    }).then(window.location.href = ' ../messages/views/open-message.php')
             });
                 });
             })
     }
 
 
-    sidebarNav.addEventListener('click', (e) => {
+   /* sidebarNav.addEventListener('click', (e) => {
         const targetLi = e.target.closest('li');
         if (!targetLi) return;
 
@@ -189,7 +189,12 @@ document.addEventListener('DOMContentLoaded', () => {
             mainViewContent.innerHTML = '';
             generateContent({ 'folderName': folderName });
         }
-    });
+    });*/
+    folderName = 'Inbox';
+    document.getElementById('main-view-title').textContent = 'Входящи';
+    generateContent({ folderName });
+
+
     changeStarredStatusOfMessage();
     removeMessage();
     sort();
