@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/storage/messageRepository.php';
+require_once __DIR__ . '/../messages/storage/messageRepository.php';
 
 class MessageController {
     private $messageRepository;

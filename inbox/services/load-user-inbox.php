@@ -1,6 +1,5 @@
 <?php 
     require_once('../MessageController.php');
-    //require_once __DIR__ . '../../models/message.php';     //TO-DO!!!!!
 
     if (session_status() === PHP_SESSION_NONE) {
         session_start();
