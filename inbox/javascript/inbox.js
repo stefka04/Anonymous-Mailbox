@@ -83,6 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(result => {
                 var messages = result.messages;
                 userId = result.userId;
+                var recipients = result.recipients;
+
                 const tableHead = document.getElementById('inbox-table-head');
                 tableHead.style.display = "initial";
                 const tableBody = document.getElementById('inbox-table-body');
@@ -109,7 +111,10 @@ document.addEventListener('DOMContentLoaded', () => {
                     messageSender.style.fontWeight = message['isRead'] ? "lighter" : "bold";
                     messageSender.style.fontSize = "24px";
                     var sender;
-                    if (message['isAnonymous']) {
+                    if (folderName === 'SentMessages') {                                    //NEW!!!!
+                        var messageRecipients = recipients[message['id']].join();
+                        sender = document.createTextNode(`До: ${messageRecipients}`);
+                    } else if (message['isAnonymous']) {
                         sender = document.createTextNode('Анонимен');
                     } else {
                         sender = document.createTextNode(message['senderUsername']);

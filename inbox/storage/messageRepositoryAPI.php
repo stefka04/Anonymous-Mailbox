@@ -12,7 +12,8 @@ interface MessageRepositoryAPI {
     public function removeMessageOfFolder(int $messageId, int $userId, string $folderName);
 
     public function getStarredMessagesOfUser(int $userId) : array;
-    public function getMessageRecipientsIds(int $messageId): array;
+    public function getMessageRecipientsIds(int $messageId): array;  //to remove; only usernames needed???
+    public function getMessageRecipientsUsernames(int $messageId): array;
      /*
     @messageId -> id of message that must be starred/read
     @userId -> id of current user
