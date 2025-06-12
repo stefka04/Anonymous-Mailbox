@@ -145,7 +145,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     tableBody.appendChild(messageRow);
 
-                    messageRow.addEventListener("click", (e) => {
+                   // messageRow.addEventListener("click", (e) => {
+                    messageSender.addEventListener("click", (e) => {
                         fetch('./services/set-message-in-session.php', {
                             method: "POST",
                             body: JSON.stringify(message),
