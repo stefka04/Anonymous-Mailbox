@@ -171,36 +171,6 @@ document.addEventListener('DOMContentLoaded', () => {
             })
     }
 
-
-    /* sidebarNav.addEventListener('click', (e) => {
-         const targetLi = e.target.closest('li');
-         if (!targetLi) return;
- 
-         sidebarNav.querySelectorAll('li').forEach(li => li.classList.remove('active'));
-         targetLi.classList.add('active');
- 
-         const view = targetLi.dataset.view;
-         if (view) {
-             if (view === 'inbox') {
-                 mainViewTitle.textContent = 'Входящи';
-                 folderName = 'Inbox';
-             } else if (view === 'sent') {
-                 mainViewTitle.textContent = 'Изпратени';
-                 folderName = 'SentMessages';
-             } else if (view === 'starred') {
-                 mainViewTitle.textContent = 'Със звезда';
-                 folderName = 'Starred';
-             } else if (view === 'trash') {
-                 mainViewTitle.textContent = 'Изтрити';
-                 folderName = 'Deleted';
-             }
- 
-             const mainViewContent = document.getElementById('inbox-table-body');
-             mainViewContent.innerHTML = '';
-             generateContent({ 'folderName': folderName });
-         }
-     });*/
-
     const mainViewTitle = document.getElementById('main-view-title');
     const mainViewContent = document.getElementById('inbox-table-body');
 
