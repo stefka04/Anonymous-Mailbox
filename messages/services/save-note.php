@@ -2,9 +2,11 @@
 header('Content-Type: application/json');
 require_once __DIR__ . '/../../db/db.php';
 
+session_start();
+
 $data = json_decode(file_get_contents('php://input'), true);
 
-$messageId = $data['messageId'] ?? null;
+$messageId = $_SESSION['message']['id'] ?? null;
 $content = $data['content'] ?? '';
 $posX = $data['posX'] ?? 0;
 $posY = $data['posY'] ?? 0;
