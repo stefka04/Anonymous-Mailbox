@@ -1,16 +1,3 @@
-const forgottenPasswdLabel = document.getElementById("forgotten-password");
-let verificationCode;
-
-forgottenPasswdLabel.addEventListener('click', () => {
-    const emailLabel = document.getElementById("hidden-email-label");
-    emailLabel.style.display = "block";
-    const emailField = document.getElementById("hidden-email");
-    emailField.style.display = "block";   
-    const sendCodeButton = document.getElementById("send-code-btn");
-    sendCodeButton.style.display = "block";
-});
-
-
 function createLabel(message, messageColor) {
      const responseLabel = document.getElementById("response-label");
      responseLabel.style.display = "block";
@@ -25,7 +12,6 @@ function analyzeResponse(response, message) {
         createLabel(response["message"], "red");
 }
 }
-
 
 const form = document.getElementById('login-form');
 form.addEventListener('submit', (event) => {
