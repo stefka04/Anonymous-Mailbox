@@ -44,3 +44,8 @@ replyButton.addEventListener('click', () => showReplyMessageForm(replyTitle));
 replyToAllButton.addEventListener('click', ()=> showReplyMessageForm(replyToAllTitle));
 forwardButton.addEventListener('click', ()=> showReplyMessageForm(forwardTitle));
 
+document.querySelectorAll('.menu-option').forEach(element => {
+  element.addEventListener('click', function (event) {
+      window.location.href = "../../inbox/index.html";
+  })
+});
