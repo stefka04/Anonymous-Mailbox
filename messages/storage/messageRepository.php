@@ -157,11 +157,12 @@ class MessageRepository implements MessageRepositoryAPI {
     public function getStarredMessagesOfUser(int $userId) : array {
         try {
             $connection = $this->db->getConnection();
-            $sql = "SELECT m.*, u.username AS senderUsername, ums.isRead AS isRead, ums.isStarred AS isStarred
+            $sql = "SELECT DISTINCT m.*, u.username AS senderUsername, ums.isRead AS isRead, ums.isStarred AS isStarred
                 FROM messages m
                 JOIN users AS u ON u.id = m.senderId
                 JOIN user_messages_status AS ums ON m.id = ums.messageId
-                WHERE ums.userId = ? AND ums.isStarred = 1";
+                WHERE ums.userId = ? AND ums.isStarred = 1
+                ORDER BY m.sentAt DESC";
     
             $selectStatement = $connection->prepare($sql);
             $selectStatement->execute([$userId]);
