@@ -1,5 +1,3 @@
-//1. To do: add chained messages visualization!!!
-//function for reading message content from DB needed!!!
 const replyTitle = "Отговор";
 const replyToAllTitle = "Отговор до всички";
 const forwardTitle = "Препращане";

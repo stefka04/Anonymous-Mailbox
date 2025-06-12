@@ -13,6 +13,7 @@ $message = json_decode(file_get_contents('php://input'), true);
 
         $sentAt = date('Y-m-d H:i:s');    //current time
         $chainNumber = 0;
+        $message['recipients'] = trim($message['recipients']);
         $recipientsUsernames = explode(' ', $message['recipients']);
         $recipientsIds = [];
         foreach ($recipientsUsernames as $recipientUsername) {

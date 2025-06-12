@@ -3,7 +3,7 @@
 }
 
 body {
-    background-color:  #A7C7E7;
+    background-color: #A7C7E7;
     height: 100vh;
     font-family: 'Roboto', sans-serif, Arial;
 }
@@ -15,11 +15,11 @@ body {
     cursor: pointer;
 }
 
-#new-message{
-    float:right;
+#new-message {
+    float: right;
     border: 2px solid black;
     padding-bottom: 0px;
-   /* display: none;*/
+    /* display: none;*/
 
     position: fixed;
     bottom: 0px;
@@ -35,14 +35,14 @@ body {
     padding-right: 160px;
 }
 
-.new-message-nav-icons{
+.new-message-nav-icons {
     padding-right: 16px;
     cursor: pointer;
 }
 
-#send-message-button {
+.new-message-buttons {
     border-radius: 16px;
-    background-color:cornflowerblue;
+    background-color: cornflowerblue;
     color: white;
 }
 
@@ -51,7 +51,7 @@ body {
 }
 
 #main-page {
-    display: flex;    
+    display: flex;
     height: 90%;
     background-color: #FFFFF0;
     border-radius: 10px;
@@ -65,6 +65,7 @@ body {
 
 #main-content-section {
     width: 80%;
+    padding: 12px;
 }
 
 .menu-option:hover {
@@ -79,9 +80,12 @@ body {
 
 #messages-table{
     padding-left: 5%;
-    width: 80%;    
+    width: 80%;
 }
 
+.message-cell {
+    width: 100%;
+}
 
 /*styling for inbox-table-head needed*/
 .table-messages-rows{   
@@ -91,12 +95,75 @@ body {
     border-color: #C8C8C8;
 }
 
-.message-cell:hover{
-   cursor: pointer;
-   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+.message-cell:hover {
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
 }
 
 .bin-cell {
     text-align: right;
     width: 1%;
+}
+
+#error-no-recipients {
+    display: none;
+    color: red;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    padding: 20px 30px;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    text-align: center;
+    background-color: white;
+}
+
+#close-error-btn {
+    border: none;
+    float: right;
+    margin-top: 10px;
+    padding: 8px 16px;
+    cursor: pointer;
+}
+
+/*From old project*/
+.icons{
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    border-radius: 50%;
+}
+
+.icons:hover {
+    background-color: rgba(255, 249, 249, 0.523);
+}
+
+.table-messages-rows {
+    cursor: pointer;
+}
+
+.table-messages-rows:hover {
+    background-color: rgb(219, 219, 219);
+}
+
+.main-view-content {
+    max-height: 500px;
+    overflow-y: auto;
+    overflow-x: auto;
+    display: block;
+}
+
+#messages-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+#inbox-table-head {
+    height: 64px;
+}
+
+.select-options {
+    background-color: rgb(219, 219, 219);
 }

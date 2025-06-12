@@ -45,19 +45,18 @@
                     <img id="inbox-icon" class="icons" src="../../img/inbox.png" alt="Inbox icon" />
                     Входяща поща
                 </h2>
-                <h2 id = "inbox" class="menu-option">
+                <h2 id = "sent" class="menu-option">
                     <img id="sent-icon" class="icons" src="../../img/sent.png" alt="Sent icon" />
                     Изпратени
                 </h2>
-                <h2 id = "inbox" class="menu-option">
+                <h2 id = "starred" class="menu-option">
                     <img id="star-icon" class="icons" src="../../img/star.png" alt="Star icon" />
                     Със звезда
                 </h2>
-                <h2 id = "inbox" class="menu-option">
+                <h2 id = "deleted" class="menu-option">
                     <img id="bin-icon" class="icons" src="../../img/bin.png" alt="Bin icon" />
                     Изтрити
                 </h2>
-                <!--Drafts??-->
             </div>
         </section>
               
@@ -92,8 +91,6 @@
                                     <td id="new-message-title">
                                         <h2>Ново съобщение</h2>
                                     </td>
-                                    <td><img id="minimize-icon" class="new-message-nav-icons" src="../../img/minimize.png"
-                                            alt="Minimize icon" title="Намаляване" /></td>
                                     <td><img id="cancel-icon" class="new-message-nav-icons" src="../../img/cancel.png"
                                             alt="Cancel icon" title="Затваряне БЕЗ запазване" /></td>
                                 </tr>
@@ -115,8 +112,6 @@
                             <tbody>
                                 <tr>
                                     <td><input type="submit" id="send-message-button" value="Изпращане" /></td>
-                                    <td><img id="attach-files-icon" class="icons" src="../../img/attach-files.png"
-                                            alt="attach-files icon" /></td>
                                 </tr>
                             </tbody>
                         </table>
