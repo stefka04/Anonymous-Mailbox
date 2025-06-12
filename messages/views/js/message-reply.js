@@ -1,5 +1,3 @@
-//1. To do: add chained messages visualization!!!
-//function for reading message content from DB needed!!!
 const replyTitle = "Отговор";
 const replyToAllTitle = "Отговор до всички";
 const forwardTitle = "Препращане";
@@ -44,3 +42,8 @@ replyButton.addEventListener('click', () => showReplyMessageForm(replyTitle));
 replyToAllButton.addEventListener('click', ()=> showReplyMessageForm(replyToAllTitle));
 forwardButton.addEventListener('click', ()=> showReplyMessageForm(forwardTitle));
 
+document.querySelectorAll('.menu-option').forEach(element => {
+  element.addEventListener('click', function (event) {
+      window.location.href = "../../inbox/index.html";
+  })
+});
