@@ -1,3 +1,10 @@
+//Extracting the existing notes from the query parameter
+document.addEventListener('DOMContentLoaded', () => {
+    const urlParams = new URLSearchParams(window.location.search);
+    const messageId = urlParams.get('messageId');
+    console.log(`Loaded messageId: ${messageId}`);
+});
+
 //some notes-dragging functions:
 function makeDraggable(element) {
   let isDragging = false;
@@ -59,7 +66,34 @@ function handleSaveImage(noteElement) {
     saveImage.style.height = "20%";
     saveImage.style.width = "20%";
 
-    saveImage.addEventListener('click', saveNoteTo(noteElement));
+    saveImage.addEventListener('click', () => {
+        const input = noteElement.querySelector('input');
+        const content = input.value || "";
+        const posX = parseInt(noteElement.style.left);
+        const posY = parseInt(noteElement.style.top);
+        const targetMessageId = messageId;
+
+        
+        console.log("Saving note for messageId:", targetMessageId);
+    //new
+         const response =  fetch('../services/save-note.php', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                messageId: messageId,
+                content,
+                posX,
+                posY
+            })
+        }).then (response => response.json()).then(result => {
+           if (result.status !== 'success') {
+            alert('Failed to save note: ' + result.message);
+        } })
+        
+          
+    //end
+      });
+
     noteElement.appendChild(saveImage);    
 }
 
@@ -93,7 +127,10 @@ document.querySelectorAll('.annotatable').forEach(element => {
     note.style.display = 'block';
 
     //mapping the nwely created note to its element
-    note.dataset.target = element.getAttribute('id');
+    note.dataset.target = element.getAttribute('id');   //redundant?
+
+    note.dataset.messageId = messageId;  //Important!!!
+
     element.appendChild(note);
     note.focus();
     makeDraggable(note);

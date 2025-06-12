@@ -17,6 +17,7 @@ body {
 .sticky-note{
   resize: both;
   overflow: auto;
+  background-color: burlywood;
 }
 
 .note-corner-icon:hover{
