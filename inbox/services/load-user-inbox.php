@@ -5,9 +5,8 @@
         session_start();
     }
 
-    //if (isset($_SESSION["user"])) {
-     //   $userId = $_SESSION['user']['id'];
-        $userId = 4;
+     if (isset($_SESSION["user"])) {
+        $userId = $_SESSION['user']['id'];
         $data = json_decode(file_get_contents('php://input'), true);
         $messageController = new MessageController();
         $userMessages = [];
@@ -40,12 +39,11 @@
             $recipientsUsernames[$messageId] = $messageController->getMessageRecipientsUsernames($messageId);
         }
         $messagesJson = array_map(fn($msg) => $msg->jsonSerialize(), $userMessages);
-       // echo json_encode(["userId" => $userId, "messages" => $messagesJson], JSON_UNESCAPED_UNICODE);          //TO-DO!!!
        echo json_encode(["userId" => $userId, "messages" => $messagesJson, "recipients" => $recipientsUsernames], JSON_UNESCAPED_UNICODE);
-     /*} else {
+     } else {
         http_response_code(400);
         error_log(date("Y-m-d H:i:s") . " - Error occurred while generatung messages: ", 3, __DIR__ . "/../../logs/error_log.txt");
         echo json_encode(["message" => "Грешка при отварянето на кутия със съобщения!"]);
         exit();
-    }*/
+    }
 ?>
