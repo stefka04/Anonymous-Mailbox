@@ -1,7 +1,6 @@
 document.getElementById("new-message-form").addEventListener("submit", function (e) {
     e.preventDefault();
 
-
     const data = {
         recipients: document.querySelector('[name="receivers"]').value,
         topic: document.querySelector('[name="topic"]').value,

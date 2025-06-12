@@ -1,5 +1,5 @@
 <?php
-require_once __DIR__ . '/storage/messageRepository.php';
+require_once __DIR__ . '/../messages/storage/messageRepository.php';
 
 class MessageController {
     private $messageRepository;
@@ -20,8 +20,12 @@ class MessageController {
         return $this->messageRepository->getStarredMessagesOfUser($userId);
     }
 
-    public function getMessageRecipientsIds($messageId): array {
+    public function getMessageRecipientsIds($messageId): array {             //TO Remove!!
         return $this->messageRepository->getMessageRecipientsIds($messageId);
+    }
+
+    public function getMessageRecipientsUsernames($messageId): array {
+         return $this->messageRepository->getMessageRecipientsUsernames($messageId);
     }
 
     public function changeStarredStatusOfMessage($isStarred, $messageId, $userId, $folderName) {

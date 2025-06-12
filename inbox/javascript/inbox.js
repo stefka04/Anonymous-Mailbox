@@ -1,13 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
-
-   
-
-    //const sidebarNav = document.querySelector('.sidebar-nav ul');
-    const mainViewTitle = document.getElementById('main-view-title');
-
-
     var userId;         //From Session or???
-    var folderName;
+    var folderName = 'Inbox';
 
     function changeStarredStatusOfMessage() {
         const starParent = document.getElementById('inbox-table-body');
@@ -15,8 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
             if (event.target.id.startsWith('star-')) {
                 const starId = event.target.id;
                 const starIcon = document.getElementById(starId);
-                
-
                 const numIdStart = 5;
                 const messageId = starId.substring(numIdStart);
                 var starred = true;
@@ -92,6 +83,8 @@ document.addEventListener('DOMContentLoaded', () => {
             .then(result => {
                 var messages = result.messages;
                 userId = result.userId;
+                var recipients = result.recipients;
+
                 const tableHead = document.getElementById('inbox-table-head');
                 tableHead.style.display = "initial";
                 const tableBody = document.getElementById('inbox-table-body');
@@ -101,40 +94,32 @@ document.addEventListener('DOMContentLoaded', () => {
                     messageRow.setAttribute("id", "msg-" + message['id']);
                     messageRow.dataset.json = JSON.stringify(message);
 
+                    const star = document.createElement("td");
+                    const starIcon = document.createElement("img");
+                    starIcon.setAttribute("src", "../img/star.png");
+                    starIcon.setAttribute("class", "icons stars");
+                    starIcon.setAttribute("alt", "Star icon");
+                    //starIcon.setAttribute("class", "icon-btn material-symbols-outlined stars");
+                    starIcon.setAttribute("id", "star-" + message['id']);
+                    starIcon.style.backgroundColor = message['isStarred'] ? "yellow" : '';
+
+                    star.appendChild(starIcon);
+                    messageRow.appendChild(star);
+                    //messageSender.appendChild(starIcon);
+
                     const messageSender = document.createElement("td");
                     messageSender.style.fontWeight = message['isRead'] ? "lighter" : "bold";
                     messageSender.style.fontSize = "24px";
-
-                    var starIcon = document.createElement("span");
-                    starIcon.setAttribute("class", "icon-btn material-symbols-outlined stars");
-                    starIcon.setAttribute("id", "star-" + message['id']);
-                    const star = document.createTextNode("star");
-                    starIcon.appendChild(star);
-                    starIcon.style.backgroundColor = message['isStarred'] ? "yellow" : '';
-                     //new
-                    const starImage = document.createElement('img');
-                    //starImage.setAttribute("src", "../img/star.png");
-                    starIcon.appendChild(starImage);
-                    //end
-                    messageSender.appendChild(starIcon);
-
-                   
-
                     var sender;
-                    if (message['isAnonymous']) {
+                    if (folderName === 'SentMessages') {                                    //NEW!!!!
+                        var messageRecipients = recipients[message['id']].join();
+                        sender = document.createTextNode(`До: ${messageRecipients}`);
+                    } else if (message['isAnonymous']) {
                         sender = document.createTextNode('Анонимен');
                     } else {
                         sender = document.createTextNode(message['senderUsername']);
                     }
                     messageSender.appendChild(sender);
-                    messageRow.appendChild(messageSender);
-
-                    var binIcon = document.createElement("td");
-                    binIcon.setAttribute("class", "icon-btn material-symbols-outlined bins");
-                    binIcon.setAttribute("id", "bin-" + message['id']);
-                    const bin = document.createTextNode("delete");
-                    binIcon.appendChild(bin);
-                    messageRow.appendChild(binIcon);
 
                     const aligningDiv = document.createElement("div");
                     const messageTopic = document.createElement("span");
@@ -144,7 +129,18 @@ document.addEventListener('DOMContentLoaded', () => {
                     messageTopic.appendChild(topic);
                     aligningDiv.appendChild(messageTopic);
                     messageSender.appendChild(aligningDiv);
-                    messageSender.style.width = "85%";
+                    messageSender.style.width = "75%";
+                    messageRow.appendChild(messageSender);
+
+                    const bin = document.createElement("td");
+                    const binIcon = document.createElement("img");
+                    binIcon.setAttribute("src", "../img/bin.png");
+                    binIcon.setAttribute("class", "icons bins");
+                    binIcon.setAttribute("alt", "Bin icon");
+                    binIcon.setAttribute("id", "bin-" + message['id']);
+
+                    bin.appendChild(binIcon);
+                    messageRow.appendChild(bin);
 
                     const messageSentAt = document.createElement("td");
                     messageSentAt.style.fontWeight = "bold";
@@ -154,8 +150,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
                     tableBody.appendChild(messageRow);
 
-                    const idToSent = message['id'];
-                    messageRow.addEventListener("click", (e) => {
+                   // messageRow.addEventListener("click", (e) => {
+                   /* messageSender.addEventListener("click", (e) => {
+                        fetch('./services/set-message-in-session.php', {
+                            method: "POST",
+                            body: JSON.stringify(message),
+                        }).then(window.location.href = ' ../messages/views/open-message.php')
+                    });*/
+
+                     const idToSent = message['id'];                //NEW!!!!! CHECK!!!!
+                     messageSender.addEventListener("click", (e) => {
                         fetch('./services/set-message-in-session.php', {
                          method: "POST",
                          body: JSON.stringify(message),
@@ -168,38 +172,93 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-   /* sidebarNav.addEventListener('click', (e) => {
-        const targetLi = e.target.closest('li');
-        if (!targetLi) return;
+    /* sidebarNav.addEventListener('click', (e) => {
+         const targetLi = e.target.closest('li');
+         if (!targetLi) return;
+ 
+         sidebarNav.querySelectorAll('li').forEach(li => li.classList.remove('active'));
+         targetLi.classList.add('active');
+ 
+         const view = targetLi.dataset.view;
+         if (view) {
+             if (view === 'inbox') {
+                 mainViewTitle.textContent = 'Входящи';
+                 folderName = 'Inbox';
+             } else if (view === 'sent') {
+                 mainViewTitle.textContent = 'Изпратени';
+                 folderName = 'SentMessages';
+             } else if (view === 'starred') {
+                 mainViewTitle.textContent = 'Със звезда';
+                 folderName = 'Starred';
+             } else if (view === 'trash') {
+                 mainViewTitle.textContent = 'Изтрити';
+                 folderName = 'Deleted';
+             }
+ 
+             const mainViewContent = document.getElementById('inbox-table-body');
+             mainViewContent.innerHTML = '';
+             generateContent({ 'folderName': folderName });
+         }
+     });*/
 
-        sidebarNav.querySelectorAll('li').forEach(li => li.classList.remove('active'));
-        targetLi.classList.add('active');
+    const mainViewTitle = document.getElementById('main-view-title');
+    const mainViewContent = document.getElementById('inbox-table-body');
 
-        const view = targetLi.dataset.view;
-        if (view) {
-            if (view === 'inbox') {
-                mainViewTitle.textContent = 'Входящи';
-                folderName = 'Inbox';
-            } else if (view === 'sent') {
-                mainViewTitle.textContent = 'Изпратени';
-                folderName = 'SentMessages';
-            } else if (view === 'starred') {
-                mainViewTitle.textContent = 'Със звезда';
-                folderName = 'Starred';
-            } else if (view === 'trash') {
-                mainViewTitle.textContent = 'Изтрити';
-                folderName = 'Deleted';
-            }
+    const inbox = document.getElementById("inbox");
+    const sent = document.getElementById("sent");
+    const starred = document.getElementById("starred");
+    const deleted = document.getElementById("deleted");
 
-            const mainViewContent = document.getElementById('inbox-table-body');
-            mainViewContent.innerHTML = '';
-            generateContent({ 'folderName': folderName });
-        }
-    });*/
-    folderName = 'Inbox';
-    document.getElementById('main-view-title').textContent = 'Входящи';
-    generateContent({ folderName });
+    inbox.addEventListener('click', (e) => {
+        inbox.style.backgroundColor = "lightblue";
+        sent.style.backgroundColor = "initial";
+        starred.style.backgroundColor = "initial";
+        deleted.style.backgroundColor = "initial";
 
+        mainViewTitle.textContent = 'Входящи';
+        folderName = 'Inbox';
+        mainViewContent.innerHTML = '';
+        generateContent({ 'folderName': folderName });
+    });
+
+    sent.addEventListener('click', (e) => {
+        sent.style.backgroundColor = "lightblue";
+        inbox.style.backgroundColor = "initial";
+        starred.style.backgroundColor = "initial";
+        deleted.style.backgroundColor = "initial";
+        
+        mainViewTitle.textContent = 'Изпратени';
+        folderName = 'SentMessages';
+        mainViewContent.innerHTML = '';
+        generateContent({ 'folderName': folderName });
+    });
+
+    starred.addEventListener('click', (e) => {
+        starred.style.backgroundColor = "lightblue";
+        inbox.style.backgroundColor = "initial";
+        sent.style.backgroundColor = "initial";
+        deleted.style.backgroundColor = "initial";
+
+        mainViewTitle.textContent = 'Със звезда';
+        folderName = 'Starred';
+        mainViewContent.innerHTML = '';
+        generateContent({ 'folderName': folderName });
+    });
+
+    deleted.addEventListener('click', (e) => {
+        deleted.style.backgroundColor = "lightblue";
+        inbox.style.backgroundColor = "initial";
+        sent.style.backgroundColor = "initial";
+        starred.style.backgroundColor = "initial";
+
+        mainViewTitle.textContent = 'Изтрити';
+        folderName = 'Deleted';
+        mainViewContent.innerHTML = '';
+        generateContent({ 'folderName': folderName });
+    });
+    
+    mainViewTitle.textContent = 'Входящи';    //default page
+    generateContent({ 'folderName': 'Inbox' });
 
     changeStarredStatusOfMessage();
     removeMessage();

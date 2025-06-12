@@ -1,7 +1,7 @@
 <?php
-require_once('message.php');
-require_once('messageRepositoryAPI.php');
-require_once('../db/db.php');
+require_once __DIR__ . '/../models/message.php';
+require_once __DIR__ . '/messageRepositoryAPI.php';
+require_once __DIR__ . '/../../db/db.php';
 
 define("INBOX_FOLDER_ID", 1);
 define("SENT_FOLDER_ID", 2);
@@ -14,27 +14,26 @@ class MessageRepository implements MessageRepositoryAPI {
         $this->db = new DB();
     }
 
-    public function addMessage(Message $message, array $recipientsIds) {
+    public function addMessage(int $senderId, string $sentAt, string $topic, string $content, $chainNumber, bool $isAnonymous, array $recipientsIds) {
         try {
             $connection = $this->db->getConnection();
             
             $connection->beginTransaction();
             $sql = "INSERT INTO messages (senderId, sentAt, topic, content, chainNumber, isAnonymous) VALUES (?, ?, ?, ?, ?, ?)";
             $insertStatement = $connection->prepare($sql);
-            $insertStatement->execute([$message->getSenderId(), $message->getSentAt(), $message->getTopic(), $message->getContent(),
-            $message->getChainNumber(), $message->getIsAnonymous()]);  
+            $insertStatement->execute([$senderId, $sentAt, $topic, $content, $chainNumber, $isAnonymous]);  
 
             $messageId = $connection->lastInsertId();
-            //add to message_status_table AS SENT --new private method
+            //add to message_status_table AS SENT
             $sql = "INSERT INTO user_messages_status (messageId, userId, messageFolderId) VALUES (?, ?, ?)";
             $insertStatement = $connection->prepare($sql);
-            $insertStatement->execute([$messageId, $message->getSenderId(), SENT_FOLDER_ID]); 
+            $insertStatement->execute([$messageId, $senderId, SENT_FOLDER_ID]); 
 
             $sql = "INSERT INTO message_recipients (messageId, recipientId, recipientGroupId) VALUES (?, ?, ?)";
             $insertStatement = $connection->prepare($sql);
 
             foreach ($recipientsIds as $recipientId) {
-                //if Group::isValidGroupId($recipientId) {
+                //if Group::isValidGroupId($recipientId) {     //TO-DO remove group logic
                 if ($this->isValidGroupId($recipientId)) {
                 //$members = Group::getMembersIdsOfGroup($recipientId)
                 $members = $this->getMembersIdsOfGroup($recipientId);
@@ -49,7 +48,7 @@ class MessageRepository implements MessageRepositoryAPI {
                 } else {
                     $insertStatement->execute([$messageId, $recipientId, null]);
 
-                    //add to message_status_table AS received  -->new method !!!!
+                    //add to message_status_table AS received
                     $sqlInsertInFolder = "INSERT INTO user_messages_status (messageId, userId, messageFolderId) VALUES (?, ?, ?)";
                     $insertStatementMessageStatus = $connection->prepare($sqlInsertInFolder);
                     $insertStatementMessageStatus->execute([$messageId, $recipientId, INBOX_FOLDER_ID]);  
@@ -62,7 +61,7 @@ class MessageRepository implements MessageRepositoryAPI {
         } catch (PDOException $e) {
             $connection->rollback();
             error_log(date("Y-m-d H:i:s") . " - Error occurred while adding message: "
-             . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
             http_response_code(500);
         }
     }
@@ -110,54 +109,12 @@ class MessageRepository implements MessageRepositoryAPI {
             }
         } catch (PDOException $e) {
             error_log(date("Y-m-d H:i:s") . " - Error occurred while removing a message with id=$messageId : "
-             . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
             http_response_code(500);
         }
     }
 
-    public function getSentMessagesOfUser(int $userId): array {
-        try {
-            $connection = $this->db->getConnection();
-            $sql = "SELECT * FROM messages WHERE senderId = ?";
-            $selectStatement = $connection->prepare($sql);
-            $selectStatement->execute([$userId]);
-            
-            $inboxData = $selectStatement->fetchAll();
-            $sentMessages = [];
-
-            foreach ($inboxData as $sentMessage) {
-                $sentMessages[] = Message::fromArray($sentMessage);
-            }
-            return $sentMessages;
-        } catch (PDOException $e) {
-            error_log(date("Y-m-d H:i:s") . " - Error occurred while getting sent messages of user with id=$userId : "
-             . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
-            http_response_code(500); 
-        }
-    }
-
-    public function getInboxOfUser(int $userId): array {
-        try {
-            $connection = $this->db->getConnection();
-            $sql = "SELECT * FROM messages m JOIN message_recipients AS mr ON m.id = mr.messageId WHERE mr.recipientId = ?";
-            $selectStatement = $connection->prepare($sql);
-            $selectStatement->execute([$userId]);
-            
-            $inboxData = $selectStatement->fetchAll();
-            $receivedMessages = [];
-
-            foreach ($inboxData as $receivedMessage) {
-                $receivedMessages[] = Message::fromArray($receivedMessage);
-            }
-            return $receivedMessages;
-        } catch (PDOException $e) {
-            error_log(date("Y-m-d H:i:s") . " - Error occurred while getting inbox messages of user with id=$userId : "
-             . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
-            http_response_code(500);
-        }
-    }
-
-    public function getMessageRecipientsIds($messageId): array {
+    public function getMessageRecipientsIds(int $messageId): array {
         try {
             $connection = $this->db->getConnection();
             $sql = "SELECT recipientId, recipientGroupId FROM message_recipients WHERE messageId = ?";
@@ -177,7 +134,28 @@ class MessageRepository implements MessageRepositoryAPI {
             return $recipientsIds;
         } catch (PDOException $e) {
             error_log(date("Y-m-d H:i:s") . " - Error occurred while getting recipientsIds of message with id=$messageId : "
-             . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
+            http_response_code(500);
+        }
+    }
+
+    public function getMessageRecipientsUsernames(int $messageId): array {            //TO-DO add Group logic if needed!!!!!!!!!!!!!!!!!!
+        try {
+            $connection = $this->db->getConnection();
+            $sql = "SELECT username FROM users AS u JOIN message_recipients AS mr ON mr.recipientId = u.id WHERE mr.messageId = ?";
+            $selectStatement = $connection->prepare($sql);
+            $selectStatement->execute([$messageId]);
+            
+            $recipientsData = $selectStatement->fetchAll();
+            $recipientsUsernames = [];
+
+            foreach ($recipientsData as $recipient) {
+                $recipientsUsernames[] = $recipient['username'];
+            }
+            return $recipientsUsernames;
+        } catch (PDOException $e) {
+            error_log(date("Y-m-d H:i:s") . " - Error occurred while getting recipientsIds of message with id=$messageId : "
+             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
             http_response_code(500);
         }
     }
@@ -186,13 +164,19 @@ class MessageRepository implements MessageRepositoryAPI {
          try {
             $connection = $this->db->getConnection();
             $messageFolderId = $this->getMessageFolderId($folderName);
-            $sql = "UPDATE user_messages_status SET isStarred = ? WHERE messageId = ? AND userId = ? AND messageFolderId = ?";
-            $updateStatement = $connection->prepare($sql);
-            $updateStatement->execute([$isStarred, $messageId, $userId, $messageFolderId]);
+             if ($this->haveSameSenderAndRecipient($messageId, $userId)) {
+                $sql = "UPDATE user_messages_status SET isStarred = ? WHERE messageId = ? AND userId = ?";
+                $updateStatement = $connection->prepare($sql);
+                $updateStatement->execute([$isStarred, $messageId, $userId]);
+            } else {
+                $sql = "UPDATE user_messages_status SET isStarred = ? WHERE messageId = ? AND userId = ? AND messageFolderId = ?";
+                $updateStatement = $connection->prepare($sql);
+                $updateStatement->execute([$isStarred, $messageId, $userId, $messageFolderId]);
+            }
         }
          catch (PDOException $e) {
             error_log(date("Y-m-d H:i:s") . " - Error occurred while starring a message with id=$messageId : "
-             . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
             http_response_code(500);
         }
     }
@@ -207,37 +191,40 @@ class MessageRepository implements MessageRepositoryAPI {
         }
          catch (PDOException $e) {
             error_log(date("Y-m-d H:i:s") . " - Error occurred while starring a message with id=$messageId : "
-             . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
             http_response_code(500);
         }
     }
-    //newly added function
+    //newly added function  TO REMOVE
     public function getMessageById(int $messageId) {
         try {
             $connection = $this->db->getConnection();
-            $sql = "SELECT * FROM messages WHERE id=?";
-            $statement = $connection->prepare($sql);
-            $statement->execute($messageId);
+            $sql = "SELECT m.*, u.username AS senderUsername FROM messages m JOIN users AS u ON u.id = m.senderId WHERE m.id=?";
+            $selectStatement = $connection->prepare($sql);
+            $selectStatement->execute($messageId);
 
-            $statement->setFetchMode(PDO::FETCH_CLASS, 'Message');
-            $message = $statement->fetch();
+            $selectStatement->setFetchMode(PDO::FETCH_CLASS, 'Message');
+            $message = $selectStatement->fetch();
             return $message;           
         }
          catch (PDOException $e) {
             error_log(date("Y-m-d H:i:s") . " - Error occurred while extracting a message with id=$messageId : "
-             . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
             http_response_code(500);
         }
     }
     //end
-    public function filterByStar(int $userId, string $folderName) : array {
+    public function getStarredMessagesOfUser(int $userId) : array {
         try {
             $connection = $this->db->getConnection();
-            $messageFolderId = $this->getMessageFolderId($folderName);
-            $sql = "SELECT * FROM messages m JOIN user_messages_status AS ums ON m.id = ums.messageId WHERE ums.userId = ? AND ums.messageFolderId = ? AND ums.isStarred = 1";
+            $sql = "SELECT m.*, u.username AS senderUsername, ums.isRead AS isRead, ums.isStarred AS isStarred
+                FROM messages m
+                JOIN users AS u ON u.id = m.senderId
+                JOIN user_messages_status AS ums ON m.id = ums.messageId
+                WHERE ums.userId = ? AND ums.isStarred = 1";
     
             $selectStatement = $connection->prepare($sql);
-            $selectStatement->execute([$userId, $messageFolderId]);
+            $selectStatement->execute([$userId]);
             
             $starredMessagesData = $selectStatement->fetchAll();
             $starredMessages = [];
@@ -248,7 +235,7 @@ class MessageRepository implements MessageRepositoryAPI {
             return $starredMessages;
         } catch (PDOException $e) {
             error_log(date("Y-m-d H:i:s") . " - Error occurred while filtering by star: " 
-            . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+            . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
             http_response_code(500);
         }
     }
@@ -257,7 +244,11 @@ class MessageRepository implements MessageRepositoryAPI {
         try {
             $connection = $this->db->getConnection();
             $messageFolderId = $this->getMessageFolderId($folderName);
-            $sql = "SELECT * FROM messages m JOIN user_messages_status AS ums ON m.id = ums.messageId WHERE ums.userId = ? AND ums.messageFolderId = ? AND ums.isRead = ?";
+            $sql = "SELECT m.*, u.username AS senderUsername, ums.isRead AS isRead, ums.isStarred AS isStarred
+                FROM messages m
+                JOIN users AS u ON u.id = m.senderId
+                JOIN user_messages_status AS ums ON m.id = ums.messageId
+                WHERE ums.userId = ? AND ums.messageFolderId = ? AND ums.isRead = ?";
     
             $selectStatement = $connection->prepare($sql);
             $selectStatement->execute([$userId, $messageFolderId, $isRead]);
@@ -271,7 +262,7 @@ class MessageRepository implements MessageRepositoryAPI {
             return $readMessages;
         } catch (PDOException $e) {
             error_log(date("Y-m-d H:i:s") . " - Error occurred while filtering by unread: " 
-            . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+            . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
             http_response_code(500);
         }
     }
@@ -280,7 +271,11 @@ class MessageRepository implements MessageRepositoryAPI {
         try {
             $connection = $this->db->getConnection();
             $messageFolderId = $this->getMessageFolderId($folderName);
-            $sql = "SELECT * FROM messages m JOIN user_messages_status AS ums ON m.id = ums.messageId WHERE ums.userId = ? AND ums.messageFolderId = ? AND m.isAnonymous = ?";
+            $sql = "SELECT m.*, u.username AS senderUsername, ums.isRead AS isRead, ums.isStarred AS isStarred
+                FROM messages m
+                JOIN users AS u ON u.id = m.senderId
+                JOIN user_messages_status AS ums ON m.id = ums.messageId
+                WHERE ums.userId = ? AND ums.messageFolderId = ? AND m.isAnonymous = ?";
     
             $selectStatement = $connection->prepare($sql);
             $selectStatement->execute([$userId, $messageFolderId, $isAnonimous]);
@@ -294,84 +289,11 @@ class MessageRepository implements MessageRepositoryAPI {
             return $anonymousMessages;
         } catch (PDOException $e) {
             error_log(date("Y-m-d H:i:s") . " - Error occurred while filtering by anonimity: " 
-            . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+            . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
             http_response_code(500);
         }
     }
 
-    //TO-DO!!!! filter samo po grupi v koito uchastva dadeniq potrebitel
-    public function filterByGroup(int $groupId, int $userId, string $folderName) : array {
-         try {
-            $connection = $this->db->getConnection();
-            $messageFolderId = $this->getMessageFolderId($folderName);
-            $sql = "SELECT * FROM messages m
-             JOIN user_messages_status AS ums ON m.id = ums.messageId
-             JOIN message_recipients AS mr ON m.id = mr.messageId
-             WHERE ums.userId = ? AND ums.messageFolderId = ? AND mr.recipientGroupId = ?";
-
-            $selectStatement = $connection->prepare($sql);
-            $selectStatement->execute([$userId, $messageFolderId, $groupId]);
-            
-            $resultData = $selectStatement->fetchAll();
-            $resultMessages = [];
-
-            foreach ($resultData as $message) {
-                $resultMessages[] = Message::fromArray($message);
-            }
-            return $resultMessages;
-        }  catch (PDOException $e) {
-            error_log(date("Y-m-d H:i:s") . " - Error occurred while filtering by group: " 
-            . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
-            http_response_code(500);
-        }
-    }
-    
-    public function filterByDate(string $date, int $userId, string $folderName) : array {
-        try {
-            $connection = $this->db->getConnection();
-            $messageFolderId = $this->getMessageFolderId($folderName);
-            $sql = "SELECT * FROM messages m JOIN user_messages_status AS ums ON m.id = ums.messageId WHERE ums.userId = ? AND ums.messageFolderId = ? AND m.sentAt = ?";
-    
-            $selectStatement = $connection->prepare($sql);
-            $selectStatement->execute([$userId, $messageFolderId, $date]);
-            
-            $messagesFromDateData = $selectStatement->fetchAll();
-            $messagesFromDate = [];
-
-            foreach ($messagesFromDateData as $messageFromDate) {
-                $messagesFromDate[] = Message::fromArray($messageFromDate);
-            }
-            return $messagesFromDate;
-        } catch (PDOException $e) {
-            error_log(date("Y-m-d H:i:s") . " - Error occurred while filtering by date: " 
-            . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
-            http_response_code(500);
-        }
-    }
-
-    public function filterByTopic(string $topic, int $userId, string $folderName) : array {
-        try {
-            $connection = $this->db->getConnection();
-            $messageFolderId = $this->getMessageFolderId($folderName);
-            $sql = "SELECT * FROM messages m JOIN user_messages_status AS ums ON m.id = ums.messageId WHERE ums.userId = ? AND ums.messageFolderId = ? AND m.topic = ?";
-    
-            $selectStatement = $connection->prepare($sql);
-            $selectStatement->execute([$userId, $messageFolderId, $topic]);
-            
-            $messagesByTopicData = $selectStatement->fetchAll();
-            $messagesByTopic = [];
-
-            foreach ($messagesByTopicData as $messageByTopic) {
-                $messagesByTopic[] = Message::fromArray($messageByTopic);
-            }
-            return $messagesByTopic;  
-        } catch (PDOException $e) {
-            error_log(date("Y-m-d H:i:s") . " - Error occurred while filtering by topic: " 
-            . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
-            http_response_code(500);
-        }
-    }
-    
     public function sortMessagesByDate(string $order, int $userId, string $folderName) : array {
          try {
             if (strcasecmp($order, "DESC") != 0 && strcasecmp($order, "ASC") != 0) {
@@ -383,7 +305,13 @@ class MessageRepository implements MessageRepositoryAPI {
             $messageFolderId = $this->getMessageFolderId($folderName);
             $order = strtoupper($order);
 
-            $sql = "SELECT * FROM messages m JOIN user_messages_status AS ums ON m.id = ums.messageId WHERE ums.userId = ? AND ums.messageFolderId = ? ORDER BY m.sentAt $order";
+            $sql = "SELECT m.*, u.username AS senderUsername, ums.isRead AS isRead, ums.isStarred AS isStarred
+                FROM messages m
+                JOIN users AS u ON u.id = m.senderId
+                JOIN user_messages_status AS ums ON m.id = ums.messageId
+                WHERE ums.userId = ? AND ums.messageFolderId = ?
+                ORDER BY m.sentAt $order";
+
             $selectStatement = $connection->prepare($sql);
             $selectStatement->execute([$userId, $messageFolderId]);
 
@@ -395,7 +323,7 @@ class MessageRepository implements MessageRepositoryAPI {
             }
             return $sortedMessages;  
         } catch (PDOException $e) {
-            error_log(date("Y-m-d H:i:s") . " - Error occurred while sorting with order= $order ". $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+            error_log(date("Y-m-d H:i:s") . " - Error occurred while sorting with order= $order ". $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
             http_response_code(500);
         }
     }
@@ -413,9 +341,9 @@ class MessageRepository implements MessageRepositoryAPI {
          try {
             $connection = $this->db->getConnection();
             $sql = "SELECT 1 AS haveSameSenderAndRecipient
-             FROM user_messages_status AS ums
-             JOIN messages AS m ON ums.messageId = m.id WHERE m.id = :messageId
-              AND m.senderId = :userId AND ums.userId = :userId";
+             FROM message_recipients AS mr
+             JOIN messages AS m ON mr.messageId = m.id WHERE m.id = :messageId
+             AND m.senderId = :userId AND mr.recipientId = :userId";
             $selectStatement = $connection->prepare($sql);
             $selectStatement->execute(['messageId' => $messageId,
                                        'userId' => $userId]);
@@ -426,7 +354,7 @@ class MessageRepository implements MessageRepositoryAPI {
         } catch (PDOException $e) {
             http_response_code(500);
              error_log(date("Y-m-d H:i:s") . " - Error occurred while getting messageFolderId with folderName=$folderName : "
-             . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
         }
     }
 
@@ -443,7 +371,7 @@ class MessageRepository implements MessageRepositoryAPI {
           } catch (PDOException $e) {
             http_response_code(500);
              error_log(date("Y-m-d H:i:s") . " - Error occurred while checking is valid group id: "
-             . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
         }
     }
 
@@ -464,14 +392,14 @@ class MessageRepository implements MessageRepositoryAPI {
         } catch (PDOException $e) {
             http_response_code(500);
              error_log(date("Y-m-d H:i:s") . " - Error occurred while members ids of group with groupId = $groupId : "
-             . $e->getMessage() . "\n", 3, "../logs/error_log.txt");
+             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
         }
     }
 }
 
 //Test cases
 
-//$test = new MessageRepository();
+$test = new MessageRepository();
 
 /*$message = new Message(2, 'Interesting topic', 'Hello world!', true);
 $test->addMessage($message, [4]);
@@ -495,6 +423,8 @@ $test->addMessage($message, [4]);*/
 
 //var_dump($test->getInboxOfUser(2));
 //var_dump($test->getInboxOfUser(4));
+
+//var_dump($test->getInboxOfUser(2));
 
 //var_dump($test->getMessageRecipientsIds(2));
 //var_dump($test->getMessageRecipientsIds(1));

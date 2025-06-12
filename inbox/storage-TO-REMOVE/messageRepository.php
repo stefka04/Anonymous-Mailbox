@@ -114,7 +114,7 @@ class MessageRepository implements MessageRepositoryAPI {
         }
     }
 
-    public function getMessageRecipientsIds($messageId): array {
+    public function getMessageRecipientsIds(int $messageId): array {
         try {
             $connection = $this->db->getConnection();
             $sql = "SELECT recipientId, recipientGroupId FROM message_recipients WHERE messageId = ?";
@@ -139,13 +139,40 @@ class MessageRepository implements MessageRepositoryAPI {
         }
     }
 
+    public function getMessageRecipientsUsernames(int $messageId): array {            //TO-DO add Group logic if needed!!!!!!!!!!!!!!!!!!
+        try {
+            $connection = $this->db->getConnection();
+            $sql = "SELECT username FROM users AS u JOIN message_recipients AS mr ON mr.recipientId = u.id WHERE mr.messageId = ?";
+            $selectStatement = $connection->prepare($sql);
+            $selectStatement->execute([$messageId]);
+            
+            $recipientsData = $selectStatement->fetchAll();
+            $recipientsUsernames = [];
+
+            foreach ($recipientsData as $recipient) {
+                $recipientsUsernames[] = $recipient['username'];
+            }
+            return $recipientsUsernames;
+        } catch (PDOException $e) {
+            error_log(date("Y-m-d H:i:s") . " - Error occurred while getting recipientsIds of message with id=$messageId : "
+             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
+            http_response_code(500);
+        }
+    }
+
     public function changeStarredStatusOfMessage(bool $isStarred, int $messageId, int $userId, string $folderName) { 
          try {
             $connection = $this->db->getConnection();
             $messageFolderId = $this->getMessageFolderId($folderName);
-            $sql = "UPDATE user_messages_status SET isStarred = ? WHERE messageId = ? AND userId = ? AND messageFolderId = ?";
-            $updateStatement = $connection->prepare($sql);
-            $updateStatement->execute([$isStarred, $messageId, $userId, $messageFolderId]);
+             if ($this->haveSameSenderAndRecipient($messageId, $userId)) {
+                $sql = "UPDATE user_messages_status SET isStarred = ? WHERE messageId = ? AND userId = ?";
+                $updateStatement = $connection->prepare($sql);
+                $updateStatement->execute([$isStarred, $messageId, $userId]);
+            } else {
+                $sql = "UPDATE user_messages_status SET isStarred = ? WHERE messageId = ? AND userId = ? AND messageFolderId = ?";
+                $updateStatement = $connection->prepare($sql);
+                $updateStatement->execute([$isStarred, $messageId, $userId, $messageFolderId]);
+            }
         }
          catch (PDOException $e) {
             error_log(date("Y-m-d H:i:s") . " - Error occurred while starring a message with id=$messageId : "
@@ -168,7 +195,7 @@ class MessageRepository implements MessageRepositoryAPI {
             http_response_code(500);
         }
     }
-    //newly added function
+    //newly added function  TO REMOVE
     public function getMessageById(int $messageId) {
         try {
             $connection = $this->db->getConnection();
@@ -314,9 +341,9 @@ class MessageRepository implements MessageRepositoryAPI {
          try {
             $connection = $this->db->getConnection();
             $sql = "SELECT 1 AS haveSameSenderAndRecipient
-             FROM user_messages_status AS ums
-             JOIN messages AS m ON ums.messageId = m.id WHERE m.id = :messageId
-              AND m.senderId = :userId AND ums.userId = :userId";
+             FROM message_recipients AS mr
+             JOIN messages AS m ON mr.messageId = m.id WHERE m.id = :messageId
+             AND m.senderId = :userId AND mr.recipientId = :userId";
             $selectStatement = $connection->prepare($sql);
             $selectStatement->execute(['messageId' => $messageId,
                                        'userId' => $userId]);
