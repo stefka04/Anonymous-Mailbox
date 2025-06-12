@@ -30,7 +30,6 @@
 <body id="page-body">
     <header>
         <div id="header-part">
-            <!--<img id="secret-unitine-logo" src="./img/" alt="Secret Unitine logo">-->
             <h1>Secret Unitine</h1>
         </div>
     </header>
@@ -58,7 +57,6 @@
                     <img id="bin-icon" class="icons" src="../../img/bin.png" alt="Bin icon" />
                     Изтрити
                 </h2>
-                <!--Drafts??-->
             </div>
         </section>
               

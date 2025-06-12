@@ -131,7 +131,7 @@
                 
                $isPasswordValid = password_verify($userData["password"], $user["password"]);
                               
-                if (!$isPasswordValid) { //for testing purposes, change to password_verify later                    
+                if (!$isPasswordValid) {                 
                     return $user;
                 } else {
                     return null;
