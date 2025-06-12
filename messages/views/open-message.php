@@ -21,18 +21,16 @@
     <title>Secret Unitine</title>
     <meta charset="UTF-8" />
     <link href="./css/open-message.css" rel="stylesheet" />
-    <!--<script src="../../javascript/new-message.js" defer></script>-->
     <script src="./js/message-reply.js" defer></script> 
-    <!--<script src="./js/read-message-from-db.js" defer></script>-->
      <script src="./js/add-notes.js" defer></script> 
-     <script src="./js/reply-to-open-message.js" defer></script> 
+     <script src="./js/logout-message.js" defer></script> 
 </head>
 
 <body id="page-body">
     <header>
         <div id="header-part">
-            <!--<img id="secret-unitine-logo" src="./img/" alt="Secret Unitine logo">-->
             <h1>Secret Unitine</h1>
+            <label id="logout-label">Изход</label>
         </div>
     </header>
 
@@ -59,7 +57,6 @@
                     <img id="bin-icon" class="icons" src="../../img/bin.png" alt="Bin icon" />
                     Изтрити
                 </h2>
-                <!--Drafts??-->
             </div>
         </section>
               
@@ -72,15 +69,7 @@
                  <h3 id="message-sender"><?php echo $_SESSION['message']['senderUsername'] ?></h3>
                     <p id="message-paragraph"  class="annotatable">
                       <?php echo $_SESSION['message']['content']?>
-                    </p>           
-
-                     <section id="message-buttons-section">
-                        <button id="reply-message-button" type="button">Отговор</button>  
-                        <button id="reply-to-all-button" type="button">Отговор до всички</button>  
-                        <button id="forward-button" type="button">Препращане</button>  
-                        <button id="chain-button" type="button">Предишно съобщение</button>  
-                    </section>  
-                                         
+                    </p>                               
               </section>                       
            </form>   
             
@@ -128,20 +117,5 @@
         </section>         
       </section>   
     </main>
-       <!--Reply-message form--> 
-                    <section id="reply-form-container"  style="display: none;">
-                        <form id="reply-form"  class="annotatable">
-                            <section class="reply-form-header">
-                                <h3 id="reply-message-title">Отговор</h3>                                
-                                <img src="../../img/cancel.png" alt="Затвори" id="close-reply-form" />
-                            </section>
-                            <input id="recipients-title" type="text">
-                            <textarea id="reply-text-area" placeholder="Въведете съобщение" rows="6"></textarea>
-                            <section class="reply-form-actions">
-                                <button id="send-reply-button" type="submit">Изпращане</button>
-                            </section>
-                      </form>
-                    </section>
-       <!--end of reply-message form-->  
   </body>
 </html>

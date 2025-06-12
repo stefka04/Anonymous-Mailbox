@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 .title {
     display: block;
     width: 100%;
@@ -92,3 +93,99 @@ button:hover, .hidden-button:hover {
    text-align:center;
 }
 
+=======
+.title {
+    display: block;
+    width: 100%;
+    margin: auto;
+    font-family: Arial, Helvetica, sans-serif;    
+    font-size: 36px;  
+    font-weight: bold;
+    font-style: italic;
+    color: #333;
+    text-align: center;
+    padding: 10px 0;
+}
+
+body {
+    display: block;
+    
+    height: 100vh;
+    width: 100vw;
+    margin: 0;
+    padding: 0;
+    font-family: "Roboto", "Arial", sans-serif;
+    color: #333;  
+    background-color: #A7C7E7;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+#login-form { 
+    display: block;   
+    width: 30%;
+    height: 40%;    
+    margin: 20px auto;
+    margin-bottom: 0;
+    padding: 30px 10px 30px 10px; 
+    background-color: #F9F6EE;
+    border-radius: 5px; 
+ }
+
+ .input-label{
+   display: block;
+   width: 80%;
+   margin: 10px auto;
+   font-family: "Roboto", "Arial", sans-serif;
+   font-size: 14px;
+   font-weight: bold;
+   color: #333; 
+   text-align: left; 
+ }
+
+ .input-field {
+    box-sizing: border-box;
+    display: block;
+    width: 80%;
+    height: 15%;
+    margin: 10px auto;
+    padding: 5px;    
+    font-size: 12px;     
+    border-radius: 5px;  
+    border: 1px solid #ccc; 
+}
+
+#register-label {
+    margin-top: 10%;
+    margin-bottom: 2%;
+    font-family: "Roboto", "Arial", sans-serif;
+    font-size: 14px;
+    text-align: center;
+}
+
+.button {
+    box-sizing: border-box;
+    margin: 0px auto 0px;
+    display: block;
+    width: 40%;
+    height: 10%;
+    border-radius: 40px;
+    border: none;    
+    background-color:   #6495ED;
+    color: #F9F6EE;
+}
+
+button:hover, .hidden-button:hover {
+    background-color:#e0e0e0;
+    cursor: pointer;
+}
+
+#response-label {
+   width: 10%;
+   margin:auto;
+   padding: 3%;
+   font-weight: bold;
+   text-align:center;
+}
+
+>>>>>>> 16ea5ad13fa02fae007ed6d53c10d3ecb1c7b597
