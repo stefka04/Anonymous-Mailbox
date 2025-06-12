@@ -36,7 +36,7 @@
         }
 
         if (!preg_match(PASSWORD_REGEX , $userData["password"])) {
-            return ["isValid" => false, "message" => "Невалидна парола!". $userData["password"]];
+            return ["isValid" => false, "message" => "Невалидна парола!"];
         }
         
         if (!preg_match(USERNAME_REGEX , $userData["username"])) {
