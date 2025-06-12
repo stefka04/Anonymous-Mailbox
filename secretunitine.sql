@@ -3,9 +3,9 @@
 -- https://www.phpmyadmin.net/
 --
 -- Хост: 127.0.0.1
--- Време на генериране:  9 юни 2025 в 19:42
+-- Време на генериране: 12 юни 2025 в 21:42
 -- Версия на сървъра: 10.4.32-MariaDB
--- Версия на PHP: 8.0.30
+-- Версия на PHP: 8.2.12
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -24,29 +24,6 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
--- Структура на таблица `groups`
---
-
-CREATE TABLE `groups` (
-  `id` int(11) NOT NULL,
-  `name` varchar(255) NOT NULL,
-  `adminId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Структура на таблица `group_members`
---
-
-CREATE TABLE `group_members` (
-  `groupId` int(11) NOT NULL,
-  `userId` int(11) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
 -- Структура на таблица `messages`
 --
 
@@ -59,6 +36,13 @@ CREATE TABLE `messages` (
   `chainNumber` int(11) DEFAULT NULL,
   `isAnonymous` tinyint(1) NOT NULL DEFAULT 0
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Схема на данните от таблица `messages`
+--
+
+INSERT INTO `messages` (`id`, `senderId`, `sentAt`, `topic`, `content`, `chainNumber`, `isAnonymous`) VALUES
+(1, 1, '2025-06-12 21:40:45', 'From me to me', 'Hello!', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -83,13 +67,43 @@ INSERT INTO `message_folders` (`id`, `folderName`) VALUES
 -- --------------------------------------------------------
 
 --
+-- Структура на таблица `message_note`
+--
+
+CREATE TABLE `message_note` (
+  `messageId` int(11) NOT NULL,
+  `noteId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Структура на таблица `message_recipients`
 --
 
 CREATE TABLE `message_recipients` (
   `messageId` int(11) NOT NULL,
-  `recipientId` int(11) NOT NULL,
-  `recipientGroupId` int(11) DEFAULT NULL
+  `recipientId` int(11) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+--
+-- Схема на данните от таблица `message_recipients`
+--
+
+INSERT INTO `message_recipients` (`messageId`, `recipientId`) VALUES
+(1, 1);
+
+-- --------------------------------------------------------
+
+--
+-- Структура на таблица `notes`
+--
+
+CREATE TABLE `notes` (
+  `id` int(11) NOT NULL,
+  `content` text NOT NULL,
+  `posX` int(11) NOT NULL,
+  `posY` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 -- --------------------------------------------------------
@@ -111,9 +125,9 @@ CREATE TABLE `roles` (
 
 CREATE TABLE `users` (
   `id` int(11) NOT NULL,
-  `fn` varchar(10) NOT NULL,
+  `fn` varchar(10) DEFAULT NULL,
   `email` varchar(50) NOT NULL,
-  `password` varchar(50) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `username` varchar(20) NOT NULL,
   `name` varchar(10) NOT NULL,
   `surname` varchar(10) NOT NULL,
@@ -125,11 +139,7 @@ CREATE TABLE `users` (
 --
 
 INSERT INTO `users` (`id`, `fn`, `email`, `password`, `username`, `name`, `surname`, `role`) VALUES
-(0, '', 'hrisi.hf@gmail.com', '$2y$10$M.XGXGHIJKaKi25OIy0dlOKJAi/yLtgYlK.P3929Mwn', 'hfrangova', 'Hrisi', 'Vasileva', 'REGLAR_USER'),
-(2, '', 'stefka@gmail.com', '$2y$10$ETm7QdgA6CMy3oBGSOOQhOT4ayyKEAeyicbpf4CQthE', 'stefka', 'Stefka', 'Lyaskaliev', 'student'),
-(3, '', 'iliyana@gmail.com', '$2y$10$75AwRxkA3N2DcTr53yfYXO5NqY2/G1LxoWqxpLjt5Vg', 'iliyana', 'Iliyana', 'Frangova', 'student'),
-(4, '', 'vladi@gmail.com', '$2y$10$PqUkGeREkuBqG.q5MyFvgeBJrjUDBHw7kRmJMsPJ8iF', 'vlado', 'Vladi', 'NeZnam', 'teacher'),
-(5, '', 'newUser@gmail.com', '$2y$10$Z6D2CT4jGvWJnyJm0VFNyefS99G6nmhaCqjUyPdh/E4', 'newUser', 'NewUserNam', 'NewUserSur', 'teacher');
+(1, '1MI0600100', 'vankata@gmail.com', '$2y$10$pE1pXay.x1tpMYbyMJNZDuhr0bVmClyqvWxEQFRZ7viH0xXHms9JC', 'ivan123', 'ivan', 'Ivanov', 'student');
 
 -- --------------------------------------------------------
 
@@ -146,22 +156,16 @@ CREATE TABLE `user_messages_status` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
+-- Схема на данните от таблица `user_messages_status`
+--
+
+INSERT INTO `user_messages_status` (`messageId`, `userId`, `messageFolderId`, `isRead`, `isStarred`) VALUES
+(1, 1, 1, 0, 0),
+(1, 1, 2, 0, 0);
+
+--
 -- Indexes for dumped tables
 --
-
---
--- Индекси за таблица `groups`
---
-ALTER TABLE `groups`
-  ADD PRIMARY KEY (`id`),
-  ADD KEY `adminId_FK` (`adminId`);
-
---
--- Индекси за таблица `group_members`
---
-ALTER TABLE `group_members`
-  ADD PRIMARY KEY (`groupId`,`userId`),
-  ADD KEY `memberOfGroup_FK` (`userId`);
 
 --
 -- Индекси за таблица `messages`
@@ -177,12 +181,24 @@ ALTER TABLE `message_folders`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Индекси за таблица `message_note`
+--
+ALTER TABLE `message_note`
+  ADD PRIMARY KEY (`messageId`,`noteId`),
+  ADD KEY `noteId` (`noteId`);
+
+--
 -- Индекси за таблица `message_recipients`
 --
 ALTER TABLE `message_recipients`
   ADD PRIMARY KEY (`messageId`,`recipientId`),
-  ADD KEY `recipientId_FK` (`recipientId`),
-  ADD KEY `recipientGroupId_FK` (`recipientGroupId`);
+  ADD KEY `recipientId_FK` (`recipientId`);
+
+--
+-- Индекси за таблица `notes`
+--
+ALTER TABLE `notes`
+  ADD PRIMARY KEY (`id`);
 
 --
 -- Индекси за таблица `roles`
@@ -202,8 +218,8 @@ ALTER TABLE `users`
 --
 ALTER TABLE `user_messages_status`
   ADD PRIMARY KEY (`messageId`,`userId`,`messageFolderId`),
-  ADD KEY `userId_FK` (`userId`),
-  ADD KEY `messageFolderId_FK` (`messageFolderId`);
+  ADD KEY `messageFolderId_FK` (`messageFolderId`),
+  ADD KEY `userId_FK` (`userId`);
 
 --
 -- AUTO_INCREMENT for dumped tables
@@ -213,30 +229,41 @@ ALTER TABLE `user_messages_status`
 -- AUTO_INCREMENT for table `messages`
 --
 ALTER TABLE `messages`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `message_folders`
 --
 ALTER TABLE `message_folders`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=11;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+
+--
+-- AUTO_INCREMENT for table `notes`
+--
+ALTER TABLE `notes`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `roles`
+--
+ALTER TABLE `roles`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `users`
+--
+ALTER TABLE `users`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT for table `user_messages_status`
+--
+ALTER TABLE `user_messages_status`
+  MODIFY `messageId` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Ограничения за дъмпнати таблици
 --
-
---
--- Ограничения за таблица `groups`
---
-ALTER TABLE `groups`
-  ADD CONSTRAINT `adminId_FK` FOREIGN KEY (`adminId`) REFERENCES `users` (`id`);
-
---
--- Ограничения за таблица `group_members`
---
-ALTER TABLE `group_members`
-  ADD CONSTRAINT `groupId_FK` FOREIGN KEY (`groupId`) REFERENCES `groups` (`id`),
-  ADD CONSTRAINT `memberOfGroup_FK` FOREIGN KEY (`userId`) REFERENCES `users` (`id`);
 
 --
 -- Ограничения за таблица `messages`
@@ -245,11 +272,17 @@ ALTER TABLE `messages`
   ADD CONSTRAINT `senderId_FK` FOREIGN KEY (`senderId`) REFERENCES `users` (`id`);
 
 --
+-- Ограничения за таблица `message_note`
+--
+ALTER TABLE `message_note`
+  ADD CONSTRAINT `messageId` FOREIGN KEY (`messageId`) REFERENCES `messages` (`id`),
+  ADD CONSTRAINT `noteId` FOREIGN KEY (`noteId`) REFERENCES `notes` (`id`);
+
+--
 -- Ограничения за таблица `message_recipients`
 --
 ALTER TABLE `message_recipients`
-  ADD CONSTRAINT `receivedMessageId_FK` FOREIGN KEY (`messageId`) REFERENCES `messages` (`id`),
-  ADD CONSTRAINT `recipientGroupId_FK` FOREIGN KEY (`recipientGroupId`) REFERENCES `groups` (`id`),
+  ADD CONSTRAINT `receivedMessageId_FK` FOREIGN KEY (`messageId`) REFERENCES `messages` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
   ADD CONSTRAINT `recipientId_FK` FOREIGN KEY (`recipientId`) REFERENCES `users` (`id`);
 
 --

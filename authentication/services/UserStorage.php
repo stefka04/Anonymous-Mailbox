@@ -168,7 +168,6 @@
         echo json_encode(["message" => "Невалидни данни"]);
     }            
 }
-//NEW - for addMessage
     function getIdOfUserByUsername($username) {
          try {
             $connection = $this->db->getConnection();
@@ -183,41 +182,6 @@
              . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
             http_response_code(500);
             exit();
-        }
-    }
-//END NEW 
-
-
-    //TO REMOVE!!
-    function resetPassword() {
-        $userData = json_decode(file_get_contents("php://input"), true);
-        if (!$userData || !isset($userData["username"]) || !isset($userData["password"])) {
-            http_response_code(400);
-            echo json_encode(["message" => "Некоректни данни!"]);
-            return;
-        }
-
-        if (!preg_match(PASSWORD_REGEX, $userData["password"])) {
-            try {
-                $conn = $this->db->getConnection();
-                $sql = "UPDATE users SET password = ? WHERE username = ?";
-                $stmt = $conn->prepare($sql);
-                $stmt->execute([password_hash($userData["password"], PASSWORD_DEFAULT), $userData["username"]]);
-
-                if ($stmt->rowCount() > 0) {
-                    http_response_code(200);
-                    echo json_encode(["message" => "Паролата е променена успешно!"]);
-                } else {
-                    http_response_code(400);
-                    echo json_encode(["message" => "Грешка при промяна на паролата!"]);
-                }
-            } catch (PDOException $e) {
-                http_response_code(500);
-                echo json_encode(["message" => "Грешка при промяна на паролата!"]);
-            }
-        } else {
-            http_response_code(400);
-            echo json_encode(["message" => "Невалидни данни!"]);
         }
     }
 }

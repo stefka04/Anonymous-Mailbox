@@ -5,10 +5,8 @@ createNewMessageDiv.addEventListener('click', () => {
     const newMessageDisplay = newMessage.style.display;
     if (newMessageDisplay == 'none') {
         newMessage.style.display = 'block';
-    }
-    //TO-DO else for more than 1 message???
+    } 
 });
-
 
 const cancelIcon = document.querySelector('#cancel-icon');
 

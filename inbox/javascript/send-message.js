@@ -21,7 +21,12 @@ document.getElementById("new-message-form").addEventListener("submit", function 
             },
             body: JSON.stringify(data)
         });
+        var newMessageForm = document.getElementById('new-message-form');
+        newMessageForm.reset();
+        const newMessage = document.getElementById('new-message');
+        newMessage.style.display = 'none';
     }
+
 });
 
 document.addEventListener("DOMContentLoaded", () => {

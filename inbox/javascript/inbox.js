@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    var userId;         //From Session or???
+    var userId;
     var folderName = 'Inbox';
 
     function changeStarredStatusOfMessage() {
@@ -99,19 +99,17 @@ document.addEventListener('DOMContentLoaded', () => {
                     starIcon.setAttribute("src", "../img/star.png");
                     starIcon.setAttribute("class", "icons stars");
                     starIcon.setAttribute("alt", "Star icon");
-                    //starIcon.setAttribute("class", "icon-btn material-symbols-outlined stars");
                     starIcon.setAttribute("id", "star-" + message['id']);
                     starIcon.style.backgroundColor = message['isStarred'] ? "yellow" : '';
 
                     star.appendChild(starIcon);
                     messageRow.appendChild(star);
-                    //messageSender.appendChild(starIcon);
 
                     const messageSender = document.createElement("td");
                     messageSender.style.fontWeight = message['isRead'] ? "lighter" : "bold";
                     messageSender.style.fontSize = "24px";
                     var sender;
-                    if (folderName === 'SentMessages') {                                    //NEW!!!!
+                    if (folderName === 'SentMessages') {                                    
                         var messageRecipients = recipients[message['id']].join();
                         sender = document.createTextNode(`До: ${messageRecipients}`);
                     } else if (message['isAnonymous']) {
@@ -149,16 +147,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     messageRow.appendChild(messageSentAt);
 
                     tableBody.appendChild(messageRow);
-
-                   // messageRow.addEventListener("click", (e) => {
-                   /* messageSender.addEventListener("click", (e) => {
-                        fetch('./services/set-message-in-session.php', {
-                            method: "POST",
-                            body: JSON.stringify(message),
-                        }).then(window.location.href = ' ../messages/views/open-message.php')
-                    });*/
-
-                     const idToSent = message['id'];                //NEW!!!!! CHECK!!!!
+      
                      messageSender.addEventListener("click", (e) => {
                         fetch('./services/set-message-in-session.php', {
                          method: "POST",

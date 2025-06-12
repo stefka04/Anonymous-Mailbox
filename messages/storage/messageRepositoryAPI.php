@@ -1,6 +1,5 @@
 <?php 
 interface MessageRepositoryAPI {
-    //recipientsIds sa id-tata na To: ot new message, moje i da sa id na grupi
     //@message - new message to add 
     public function addMessage(int $senderId, string $sentAt, string $topic, string $content, $chainNumber, bool $isAnonymous, array $recipientsIds);
 
@@ -12,7 +11,6 @@ interface MessageRepositoryAPI {
     public function removeMessageOfFolder(int $messageId, int $userId, string $folderName);
 
     public function getStarredMessagesOfUser(int $userId) : array;
-    public function getMessageRecipientsIds(int $messageId): array;  //to remove; only usernames needed???
     public function getMessageRecipientsUsernames(int $messageId): array;
      /*
     @messageId -> id of message that must be starred/read

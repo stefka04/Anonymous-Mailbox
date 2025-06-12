@@ -29,30 +29,16 @@ class MessageRepository implements MessageRepositoryAPI {
             $insertStatement = $connection->prepare($sql);
             $insertStatement->execute([$messageId, $senderId, SENT_FOLDER_ID]); 
 
-            $sql = "INSERT INTO message_recipients (messageId, recipientId, recipientGroupId) VALUES (?, ?, ?)";
+            $sql = "INSERT INTO message_recipients (messageId, recipientId) VALUES (?, ?)";
             $insertStatement = $connection->prepare($sql);
 
             foreach ($recipientsIds as $recipientId) {
-                //if Group::isValidGroupId($recipientId) {     //TO-DO remove group logic
-                if ($this->isValidGroupId($recipientId)) {
-                //$members = Group::getMembersIdsOfGroup($recipientId)
-                $members = $this->getMembersIdsOfGroup($recipientId);
-                foreach ($members as $groupMemberId) {
-                    $insertStatement->execute([$messageId, $groupMemberId, $recipientId]);
-
-                    //add to message_status_table AS received  -->new method !!! sql! vmesto sqlInsertInFolder
-                    $sqlInsertInFolder = "INSERT INTO user_messages_status (messageId, userId, messageFolderId) VALUES (?, ?, ?)";
-                    $insertStatementMessageStatus = $connection->prepare($sqlInsertInFolder);
-                    $insertStatementMessageStatus->execute([$messageId, $groupMemberId, INBOX_FOLDER_ID]); 
-                }
-                } else {
-                    $insertStatement->execute([$messageId, $recipientId, null]);
+                    $insertStatement->execute([$messageId, $recipientId]);
 
                     //add to message_status_table AS received
                     $sqlInsertInFolder = "INSERT INTO user_messages_status (messageId, userId, messageFolderId) VALUES (?, ?, ?)";
                     $insertStatementMessageStatus = $connection->prepare($sqlInsertInFolder);
                     $insertStatementMessageStatus->execute([$messageId, $recipientId, INBOX_FOLDER_ID]);  
-                }
             }
             
             $connection->commit();
@@ -95,9 +81,7 @@ class MessageRepository implements MessageRepositoryAPI {
                 $selectStatement = $connection->prepare($sql);
                 $selectStatement->execute(['messageId' => $messageId]);
                 $resultData = $selectStatement->fetch();
-                //same sender and recipient when remove from deleted message remove message from messages
                 if ($resultData && $resultData['count'] == 1) {
-                    //Important! CASCADE ON DELETE for messageId_FK in user_messages_status and message_recipients tables !
                     $sql = "DELETE FROM messages WHERE id = ?";
                     $deleteStatement = $connection->prepare($sql);
                     $deleteStatement->execute([$messageId]);
@@ -114,32 +98,7 @@ class MessageRepository implements MessageRepositoryAPI {
         }
     }
 
-    public function getMessageRecipientsIds(int $messageId): array {
-        try {
-            $connection = $this->db->getConnection();
-            $sql = "SELECT recipientId, recipientGroupId FROM message_recipients WHERE messageId = ?";
-            $selectStatement = $connection->prepare($sql);
-            $selectStatement->execute([$messageId]);
-            
-            $recipientsData = $selectStatement->fetchAll();
-            $recipientsIds = [];
-
-            foreach ($recipientsData as $recipient) {
-                if ($recipient['recipientGroupId'] == null) {
-                    $recipientsIds[] = $recipient['recipientId'];
-                } else if(!in_array($recipient['recipientGroupId'], $recipientsIds)) {
-                    $recipientsIds[] = $recipient['recipientGroupId'];
-                }
-            }
-            return $recipientsIds;
-        } catch (PDOException $e) {
-            error_log(date("Y-m-d H:i:s") . " - Error occurred while getting recipientsIds of message with id=$messageId : "
-             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
-            http_response_code(500);
-        }
-    }
-
-    public function getMessageRecipientsUsernames(int $messageId): array {            //TO-DO add Group logic if needed!!!!!!!!!!!!!!!!!!
+    public function getMessageRecipientsUsernames(int $messageId): array { 
         try {
             $connection = $this->db->getConnection();
             $sql = "SELECT username FROM users AS u JOIN message_recipients AS mr ON mr.recipientId = u.id WHERE mr.messageId = ?";
@@ -195,25 +154,6 @@ class MessageRepository implements MessageRepositoryAPI {
             http_response_code(500);
         }
     }
-    //newly added function  TO REMOVE
-    public function getMessageById(int $messageId) {
-        try {
-            $connection = $this->db->getConnection();
-            $sql = "SELECT m.*, u.username AS senderUsername FROM messages m JOIN users AS u ON u.id = m.senderId WHERE m.id=?";
-            $selectStatement = $connection->prepare($sql);
-            $selectStatement->execute($messageId);
-
-            $selectStatement->setFetchMode(PDO::FETCH_CLASS, 'Message');
-            $message = $selectStatement->fetch();
-            return $message;           
-        }
-         catch (PDOException $e) {
-            error_log(date("Y-m-d H:i:s") . " - Error occurred while extracting a message with id=$messageId : "
-             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
-            http_response_code(500);
-        }
-    }
-    //end
     public function getStarredMessagesOfUser(int $userId) : array {
         try {
             $connection = $this->db->getConnection();
@@ -357,108 +297,4 @@ class MessageRepository implements MessageRepositoryAPI {
              . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
         }
     }
-
-    //move this method to Group class make it static!!
-    private function isValidGroupId(int $groupId): bool {
-         try {
-         $connection = $this->db->getConnection();
-         $sql = "SELECT 1 AS isValidGroup FROM groups WHERE id = :groupId";
-         $selectStatement = $connection->prepare($sql);
-         $selectStatement->execute(['groupId' => $groupId]);
-            
-         $resultData = $selectStatement->fetch();
-         return $resultData ? $resultData['isValidGroup'] : false;
-          } catch (PDOException $e) {
-            http_response_code(500);
-             error_log(date("Y-m-d H:i:s") . " - Error occurred while checking is valid group id: "
-             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
-        }
-    }
-
-    //move this method to Group class make it static!!
-    private function getMembersIdsOfGroup(int $groupId):?array {
-         try {
-            $connection = $this->$db->getConnection();
-            $sql = "SELECT userId FROM group_members WHERE groupId = :groupId";
-            $selectStatement = $connection->prepare($sql);
-            $selectStatement->execute(['groupId' => $groupId]);
-            
-            $usersData = $selectStatement->fetchAll();
-            $usersIds = [];
-            foreach ($usersData as $userId) {
-                $usersIds[] = $userId['userId'];
-            }
-            return $usersIds;
-        } catch (PDOException $e) {
-            http_response_code(500);
-             error_log(date("Y-m-d H:i:s") . " - Error occurred while members ids of group with groupId = $groupId : "
-             . $e->getMessage() . "\n", 3, __DIR__ . "/../../logs/error_log.txt");
-        }
-    }
 }
-
-//Test cases
-
-$test = new MessageRepository();
-
-/*$message = new Message(2, 'Interesting topic', 'Hello world!', true);
-$test->addMessage($message, [4]);
-$message = new Message(3, 'New topic', 'Bye!', true);
-$test->addMessage($message, [2, 4]);*/
-
-/*$message = new Message(3, 'Same sender and recipient', 'Bye bye!', false);
-$test->addMessage($message, [3]);*/
-
-//$test->removeMessageOfFolder(1, 4, 'Inbox');
-//$test->removeMessageOfFolder(1, 2, 'SentMessages');
-//$test->removeMessageOfFolder(3, 3, 'SentMessages');
-//$test->removeMessageOfFolder(3, 3, 'Deleted');
-//$test->removeMessageOfFolder(1, 2, 'Deleted');
-
-/*$message = new Message(3, 'Interesting topic', 'Hello world!', true);
-$test->addMessage($message, [4]);*/
-
-//var_dump($test->getSentMessagesOfUser(3));
-//var_dump($test->getSentMessagesOfUser(2));
-
-//var_dump($test->getInboxOfUser(2));
-//var_dump($test->getInboxOfUser(4));
-
-//var_dump($test->getInboxOfUser(2));
-
-//var_dump($test->getMessageRecipientsIds(2));
-//var_dump($test->getMessageRecipientsIds(1));
-//var_dump($test->getMessageRecipientsIds(1));
-
-//$test->changeStarredStatusOfMessage(true, 2, 2, 'Inbox');
-//$test->changeStarredStatusOfMessage(true, 4, 3, 'SentMessages');
-//$test->changeStarredStatusOfMessage(false, 4, 3, 'SentMessages');
-
-//$test->unstarMessage(4, 3, 'SentMessages');
-
-//$test->readMessage(2, 2, 'Inbox');
-//$test->readMessage(4, 3, 'SentMessages');
-//$test->readMessage(1, 4, 'Deleted');
-
-//var_dump($test->filterByStar(2, 'Inbox'));
-//var_dump($test->filterByStar(4, 'SentMessages'));
-
-//var_dump($test->filterByRead(false, 4, 'Inbox'));
-//var_dump($test->filterByRead(false, 4, 'Deleted'));
-//var_dump($test->filterByRead(false, 3, 'SentMessages'));
-
-//var_dump($test->filterByRead(true, 4, 'Inbox'));
-//var_dump($test->filterByRead(true, 4, 'Deleted'));
-//var_dump($test->filterByRead(true, 3, 'SentMessages'));
-
-//var_dump($test->filterByAnonimity(true, 3, 'SentMessages'));
-//var_dump($test->filterByAnonimity(false, 3, 'SentMessages'));
-
-//var_dump($test->filterByDate('2025-06-08 16:20:53', 3, 'SentMessages'));
-
-//var_dump($test->filterByTopic('Interesting topic', 3, 'SentMessages'));
-//var_dump($test->filterByTopic('New topic', 2, 'Inbox'));
-
-//var_dump($test->sortMessagesByDate('ASC', 4, 'Inbox'));
-//var_dump($test->sortMessagesByDate('DESC', 4, 'Inbox'));
-?>
