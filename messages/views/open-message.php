@@ -2,8 +2,6 @@
 
     session_start();
 
-    //$topic = htmlspecialchars($message['topic'] ?? '', ENT_QUOTES, 'UTF-8');
-    //$messageSender = htmlspecialchars($message['senderUsername'] ?? '', ENT_QUOTES, 'UTF-8');
     $message = $_SESSION['message'] ? $_SESSION['message']  : null;
     if ($message) {
        
